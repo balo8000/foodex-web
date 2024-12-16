@@ -7,7 +7,7 @@ import {
 } from '@mui/material';
 import { motion } from 'framer-motion';
 import SearchBar from '../components/SearchBar';
-import Categories from '../components/Categories';
+import Categories from '../components/home/Categories';
 import RestaurantCard from '../components/RestaurantCard';
 
 const restaurantsData = [
@@ -42,21 +42,6 @@ const restaurantsData = [
     deliveryTime: 40,
     offer: 'Buy 1 Get 1 Free Swallow',
   },
-  {
-    name: 'Mshikaki House',
-    image: '/images/mshikaki.jpg',
-    rating: 4.7,
-    cuisine: 'East African • Grills • Street Food',
-    deliveryTime: 30,
-    offer: '2 Free Sides',
-  },
-  {
-    name: 'Injera Express',
-    image: '/images/injera.jpg',
-    rating: 4.8,
-    cuisine: 'Ethiopian • Traditional • Stews',
-    deliveryTime: 35,
-  },
 ];
 
 const Home = () => {
@@ -68,7 +53,7 @@ const Home = () => {
     return restaurants.filter(restaurant => {
       const matchesSearch = restaurant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         restaurant.cuisine.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = selectedCategory === 'All' || restaurant.cuisine === selectedCategory;
+      const matchesCategory = selectedCategory === 'All' || restaurant.cuisine.includes(selectedCategory);
       return matchesSearch && matchesCategory;
     });
   }, [restaurants, searchQuery, selectedCategory]);
