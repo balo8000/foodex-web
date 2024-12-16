@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import { CartProvider } from './contexts/CartContext';
 import { UserProvider } from './contexts/UserContext';
@@ -58,10 +58,18 @@ const theme = createTheme({
   },
 });
 
-function ProtectedRoute({ children }) {
-  // Add your authentication logic here
-  const isAuthenticated = true; // For demo purposes
-  return isAuthenticated ? children : <Navigate to="/welcome" />;
+function ProtectedRoute() {
+  // Temporary authentication logic - replace with actual authentication
+  const isAuthenticated = true; 
+  return isAuthenticated ? (
+    <MainLayout>
+      <PageTransition>
+        <Outlet />
+      </PageTransition>
+    </MainLayout>
+  ) : (
+    <Navigate to="/welcome" replace />
+  );
 }
 
 function App() {
@@ -79,96 +87,15 @@ function App() {
                 <Route path="/login" element={<Login />} />
                 <Route path="/signup" element={<SignUp />} />
                 
-                <Route 
-                  path="/home" 
-                  element={
-                    <ProtectedRoute>
-                      <MainLayout>
-                        <PageTransition>
-                          <Home />
-                        </PageTransition>
-                      </MainLayout>
-                    </ProtectedRoute>
-                  } 
-                />
-                
-                <Route 
-                  path="/menu" 
-                  element={
-                    <ProtectedRoute>
-                      <MainLayout>
-                        <PageTransition>
-                          <RestaurantMenu />
-                        </PageTransition>
-                      </MainLayout>
-                    </ProtectedRoute>
-                  } 
-                />
-                
-                <Route 
-                  path="/cart" 
-                  element={
-                    <ProtectedRoute>
-                      <MainLayout>
-                        <PageTransition>
-                          <Cart />
-                        </PageTransition>
-                      </MainLayout>
-                    </ProtectedRoute>
-                  } 
-                />
-                
-                <Route 
-                  path="/profile" 
-                  element={
-                    <ProtectedRoute>
-                      <MainLayout>
-                        <PageTransition>
-                          <Profile />
-                        </PageTransition>
-                      </MainLayout>
-                    </ProtectedRoute>
-                  } 
-                />
-                
-                <Route 
-                  path="/addresses" 
-                  element={
-                    <ProtectedRoute>
-                      <MainLayout>
-                        <PageTransition>
-                          <Addresses />
-                        </PageTransition>
-                      </MainLayout>
-                    </ProtectedRoute>
-                  } 
-                />
-                
-                <Route 
-                  path="/payment-methods" 
-                  element={
-                    <ProtectedRoute>
-                      <MainLayout>
-                        <PageTransition>
-                          <PaymentMethods />
-                        </PageTransition>
-                      </MainLayout>
-                    </ProtectedRoute>
-                  } 
-                />
-                
-                <Route 
-                  path="/order-history" 
-                  element={
-                    <ProtectedRoute>
-                      <MainLayout>
-                        <PageTransition>
-                          <OrderHistory />
-                        </PageTransition>
-                      </MainLayout>
-                    </ProtectedRoute>
-                  } 
-                />
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/home" element={<Home />} />
+                  <Route path="/menu" element={<RestaurantMenu />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/profile" element={<Profile />} />
+                  <Route path="/addresses" element={<Addresses />} />
+                  <Route path="/payment-methods" element={<PaymentMethods />} />
+                  <Route path="/order-history" element={<OrderHistory />} />
+                </Route>
                 
                 <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>

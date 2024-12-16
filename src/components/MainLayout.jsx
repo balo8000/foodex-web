@@ -3,11 +3,11 @@ import { Box, AppBar, Toolbar, IconButton, useTheme, Typography, Badge, Avatar }
 import { DarkMode, LightMode, ShoppingCart } from '@mui/icons-material';
 import FancyBottomNav from './navigation/FancyBottomNav';
 import { useUser } from '../contexts/UserContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Outlet } from 'react-router-dom';
 import { useCart } from '../contexts/CartContext';
 import { alpha } from '@mui/material/styles';
 
-const MainLayout = ({ children }) => {
+const MainLayout = () => {
   const theme = useTheme();
   const navigate = useNavigate();
   const { user, updatePreferences } = useUser();
@@ -106,7 +106,7 @@ const MainLayout = ({ children }) => {
           px: 2,
         }}
       >
-        {React.isValidElement(children) ? children : null}
+        <Outlet />
       </Box>
       <FancyBottomNav />
     </Box>
