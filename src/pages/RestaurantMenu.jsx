@@ -1,409 +1,285 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import {
   Box,
   Container,
   Typography,
-  Paper,
-  IconButton,
-  Divider,
-  Drawer,
-  Badge,
-  Fab,
+  Tabs,
+  Tab,
   Grid,
   Card,
   CardMedia,
-  CardContent,
-  Button,
   Rating,
   Chip,
+  useTheme,
+  alpha,
+  Divider,
+  Button,
+  IconButton,
 } from '@mui/material';
 import {
-  Add as AddIcon,
-  Remove as RemoveIcon,
-  ShoppingCart as CartIcon,
+  AccessTime,
+  Delivery,
+  Info,
+  LocalOffer,
+  Star,
   Favorite,
   FavoriteBorder,
-  AccessTime,
-  LocalOffer,
+  NavigateBefore,
 } from '@mui/icons-material';
-import { motion, AnimatePresence } from 'framer-motion';
-import TopNavBar from '../components/navigation/TopNavBar';
+import { motion } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
+import FoodCard from '../components/food/FoodCard';
 
 const menuCategories = [
-  {
-    name: 'Popular',
-    items: [
-      {
-        id: 1,
-        name: 'Jollof Rice Special',
-        description: 'Smoky and flavorful rice cooked in tomato sauce with special spices',
-        price: 12.99,
-        image: '/images/jollof-rice.jpg',
-        rating: 4.8,
-        spicy: true,
-        popular: true,
-      },
-      {
-        id: 2,
-        name: 'Pounded Yam & Egusi',
-        description: 'Smooth pounded yam served with rich egusi soup and assorted meat',
-        price: 15.99,
-        image: '/images/pounded-yam.jpg',
-        rating: 4.9,
-        popular: true,
-      },
-    ],
-  },
-  {
-    name: 'Main Dishes',
-    items: [
-      {
-        id: 3,
-        name: 'Suya Platter',
-        description: 'Grilled spiced meat served with onions and tomatoes',
-        price: 18.99,
-        image: '/images/suya.jpg',
-        rating: 4.7,
-        spicy: true,
-      },
-      {
-        id: 4,
-        name: 'Afang Soup Special',
-        description: 'Traditional soup made with afang leaves and waterleaf',
-        price: 16.99,
-        image: '/images/afang-soup.jpg',
-        rating: 4.6,
-      },
-    ],
-  },
+  { id: 'all', label: 'All' },
+  { id: 'starters', label: 'Starters' },
+  { id: 'main', label: 'Main Course' },
+  { id: 'pizza', label: 'Pizza' },
+  { id: 'pasta', label: 'Pasta' },
+  { id: 'desserts', label: 'Desserts' },
+  { id: 'drinks', label: 'Drinks' },
 ];
 
-const MenuItem = ({ item, onAddToCart }) => {
-  const [quantity, setQuantity] = useState(0);
-
-  const handleAdd = () => {
-    setQuantity(prev => prev + 1);
-    onAddToCart(item, quantity + 1);
-  };
-
-  const handleRemove = () => {
-    if (quantity > 0) {
-      setQuantity(prev => prev - 1);
-      onAddToCart(item, quantity - 1);
-    }
-  };
-
-  return (
-    <Card
-      component={motion.div}
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: 20 }}
-      sx={{
-        display: 'flex',
-        flexDirection: { xs: 'column', sm: 'row' },
-        overflow: 'hidden',
-        mb: 2,
-        borderRadius: 2,
-      }}
-    >
-      <CardMedia
-        component="img"
-        sx={{
-          width: { xs: '100%', sm: 140 },
-          height: { xs: 140, sm: '100%' },
-          objectFit: 'cover',
-        }}
-        image={item.image}
-        alt={item.name}
-      />
-      <CardContent sx={{ flex: 1, p: 2 }}>
-        <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-          <Box>
-            <Typography variant="h6" sx={{ fontWeight: 600, mb: 0.5 }}>
-              {item.name}
-              {item.spicy && (
-                <Chip
-                  label="Spicy"
-                  size="small"
-                  color="error"
-                  sx={{ ml: 1, height: 20 }}
-                />
-              )}
-            </Typography>
-            <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-              {item.description}
-            </Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 1 }}>
-              <Rating value={item.rating} size="small" readOnly precision={0.1} />
-              <Typography variant="body2" color="text.secondary">
-                ({item.rating})
-              </Typography>
-            </Box>
-            <Typography variant="h6" color="primary" sx={{ fontWeight: 600 }}>
-              ${item.price}
-            </Typography>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-            <IconButton 
-              size="small" 
-              onClick={handleRemove}
-              disabled={quantity === 0}
-              sx={{ 
-                bgcolor: 'action.hover',
-                '&:hover': { bgcolor: 'action.selected' },
-              }}
-            >
-              <RemoveIcon />
-            </IconButton>
-            <Typography sx={{ minWidth: 20, textAlign: 'center' }}>
-              {quantity}
-            </Typography>
-            <IconButton 
-              size="small" 
-              onClick={handleAdd}
-              sx={{ 
-                bgcolor: 'action.hover',
-                '&:hover': { bgcolor: 'action.selected' },
-              }}
-            >
-              <AddIcon />
-            </IconButton>
-          </Box>
-        </Box>
-      </CardContent>
-    </Card>
-  );
-};
-
-const CartDrawer = ({ open, onClose, cartItems, onUpdateQuantity }) => {
-  const total = cartItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-  return (
-    <Drawer
-      anchor="right"
-      open={open}
-      onClose={onClose}
-      PaperProps={{
-        sx: { width: { xs: '100%', sm: 400 } },
-      }}
-    >
-      <Box sx={{ p: 2, height: '100%', display: 'flex', flexDirection: 'column' }}>
-        <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-          Your Cart
-        </Typography>
-        
-        <Box sx={{ flex: 1, overflow: 'auto' }}>
-          {cartItems.map((item) => (
-            <Box key={item.id} sx={{ mb: 2 }}>
-              <Box sx={{ display: 'flex', gap: 2, mb: 1 }}>
-                <Box
-                  component="img"
-                  src={item.image}
-                  alt={item.name}
-                  sx={{ width: 60, height: 60, borderRadius: 1, objectFit: 'cover' }}
-                />
-                <Box sx={{ flex: 1 }}>
-                  <Typography variant="subtitle1" sx={{ fontWeight: 500 }}>
-                    {item.name}
-                  </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    ${item.price}
-                  </Typography>
-                </Box>
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-                  <IconButton
-                    size="small"
-                    onClick={() => onUpdateQuantity(item, item.quantity - 1)}
-                    disabled={item.quantity === 0}
-                  >
-                    <RemoveIcon />
-                  </IconButton>
-                  <Typography>{item.quantity}</Typography>
-                  <IconButton
-                    size="small"
-                    onClick={() => onUpdateQuantity(item, item.quantity + 1)}
-                  >
-                    <AddIcon />
-                  </IconButton>
-                </Box>
-              </Box>
-              <Divider />
-            </Box>
-          ))}
-        </Box>
-
-        <Box sx={{ pt: 2 }}>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-            <Typography variant="h6">Total</Typography>
-            <Typography variant="h6" color="primary">
-              ${total.toFixed(2)}
-            </Typography>
-          </Box>
-          <Button
-            variant="contained"
-            fullWidth
-            size="large"
-            onClick={onClose}
-            sx={{ mb: 1 }}
-          >
-            Checkout
-          </Button>
-        </Box>
-      </Box>
-    </Drawer>
-  );
+const menuItems = {
+  starters: [
+    {
+      id: 's1',
+      name: 'Bruschetta',
+      description: 'Grilled bread rubbed with garlic and topped with tomatoes, olive oil, salt and pepper',
+      price: 7.99,
+      image: '/images/bruschetta.jpg',
+      rating: 4.5,
+      reviews: 86,
+      preparationTime: 10,
+    },
+    {
+      id: 's2',
+      name: 'Caprese Salad',
+      description: 'Fresh mozzarella, tomatoes, and sweet basil leaves seasoned with salt and olive oil',
+      price: 8.99,
+      image: '/images/caprese.jpg',
+      rating: 4.3,
+      reviews: 64,
+      preparationTime: 8,
+    },
+  ],
+  main: [
+    {
+      id: 'm1',
+      name: 'Grilled Salmon',
+      description: 'Fresh Atlantic salmon fillet grilled to perfection with herbs and lemon',
+      price: 24.99,
+      image: '/images/salmon.jpg',
+      rating: 4.8,
+      reviews: 142,
+      preparationTime: 25,
+      discount: 10,
+    },
+    {
+      id: 'm2',
+      name: 'Beef Steak',
+      description: 'Premium cut beef steak cooked to your preference with seasonal vegetables',
+      price: 29.99,
+      image: '/images/steak.jpg',
+      rating: 4.9,
+      reviews: 186,
+      preparationTime: 30,
+    },
+  ],
+  pizza: [
+    {
+      id: 'p1',
+      name: 'Margherita Pizza',
+      description: 'Fresh tomatoes, mozzarella, basil, and extra virgin olive oil',
+      price: 12.99,
+      image: '/images/pizza.jpg',
+      rating: 4.5,
+      reviews: 128,
+      preparationTime: 20,
+      discount: 15,
+    },
+  ],
+  pasta: [
+    {
+      id: 'pa1',
+      name: 'Pasta Carbonara',
+      description: 'Creamy pasta with pancetta, eggs, parmesan, and black pepper',
+      price: 14.99,
+      image: '/images/pasta.jpg',
+      rating: 4.7,
+      reviews: 189,
+      preparationTime: 25,
+    },
+  ],
+  desserts: [
+    {
+      id: 'd1',
+      name: 'Tiramisu',
+      description: 'Classic Italian dessert made with layers of coffee-soaked ladyfingers and mascarpone cream',
+      price: 8.99,
+      image: '/images/tiramisu.jpg',
+      rating: 4.6,
+      reviews: 94,
+      preparationTime: 10,
+    },
+  ],
+  drinks: [
+    {
+      id: 'dr1',
+      name: 'Italian Wine',
+      description: 'Premium Italian red wine, perfect complement to your meal',
+      price: 19.99,
+      image: '/images/wine.jpg',
+      rating: 4.4,
+      reviews: 56,
+    },
+  ],
 };
 
 const RestaurantMenu = () => {
-  const [cartItems, setCartItems] = useState([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isFavorite, setIsFavorite] = useState(false);
+  const theme = useTheme();
+  const navigate = useNavigate();
+  const [selectedCategory, setSelectedCategory] = useState('all');
+  const [favorite, setFavorite] = useState(false);
 
-  const handleAddToCart = (item, quantity) => {
-    setCartItems(prev => {
-      const existingItem = prev.find(i => i.id === item.id);
-      if (existingItem) {
-        return prev.map(i =>
-          i.id === item.id
-            ? { ...i, quantity }
-            : i
-        ).filter(i => i.quantity > 0);
-      }
-      if (quantity > 0) {
-        return [...prev, { ...item, quantity }];
-      }
-      return prev;
-    });
+  const handleCategoryChange = (event, newValue) => {
+    setSelectedCategory(newValue);
   };
 
-  const handleUpdateCartQuantity = (item, quantity) => {
-    handleAddToCart(item, quantity);
+  const getAllItems = () => {
+    if (selectedCategory === 'all') {
+      return Object.values(menuItems).flat();
+    }
+    return menuItems[selectedCategory] || [];
   };
-
-  const totalItems = cartItems.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-      <TopNavBar
-        showBackButton
-        title="Restaurant Menu"
-        cartItemCount={totalItems}
-      />
-      
+    <Box sx={{ bgcolor: 'background.default', minHeight: '100vh' }}>
+      {/* Restaurant Header */}
       <Box
         sx={{
-          height: 200,
           position: 'relative',
-          backgroundImage: 'url(/images/restaurant-banner.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          '&::before': {
-            content: '""',
+          height: 240,
+          overflow: 'hidden',
+        }}
+      >
+        <CardMedia
+          component="img"
+          image="/images/restaurant-cover.jpg"
+          alt="Restaurant"
+          sx={{
+            height: '100%',
+            objectFit: 'cover',
+          }}
+        />
+        <Box
+          sx={{
             position: 'absolute',
             top: 0,
             left: 0,
             right: 0,
             bottom: 0,
-            backgroundColor: 'rgba(0,0,0,0.4)',
-          },
-        }}
-      >
-        <Box
-          sx={{
-            position: 'absolute',
-            bottom: 20,
-            left: 20,
-            color: 'white',
+            bgcolor: 'rgba(0,0,0,0.4)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            p: 2,
           }}
         >
-          <Typography variant="h4" sx={{ fontWeight: 600, mb: 1 }}>
-            African Kitchen
-          </Typography>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-            <Rating value={4.8} readOnly precision={0.1} />
-            <Typography>(4.8)</Typography>
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-              <AccessTime />
-              <Typography>30-45 min</Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+            <IconButton
+              onClick={() => navigate(-1)}
+              sx={{ color: 'white' }}
+            >
+              <NavigateBefore />
+            </IconButton>
+            <IconButton
+              onClick={() => setFavorite(!favorite)}
+              sx={{ color: 'white' }}
+            >
+              {favorite ? <Favorite /> : <FavoriteBorder />}
+            </IconButton>
+          </Box>
+          <Box>
+            <Typography variant="h4" color="white" fontWeight="bold">
+              Italian Restaurant
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
+              <Chip
+                icon={<Star sx={{ color: '#FFD700 !important' }} />}
+                label="4.8 (2.5k+ reviews)"
+                sx={{ color: 'white', bgcolor: 'rgba(255,255,255,0.2)' }}
+              />
+              <Chip
+                icon={<AccessTime sx={{ color: 'white !important' }} />}
+                label="30-45 min"
+                sx={{ color: 'white', bgcolor: 'rgba(255,255,255,0.2)' }}
+              />
+              <Chip
+                icon={<Delivery sx={{ color: 'white !important' }} />}
+                label="Free Delivery"
+                sx={{ color: 'white', bgcolor: 'rgba(255,255,255,0.2)' }}
+              />
             </Box>
           </Box>
         </Box>
-        <IconButton
-          onClick={() => setIsFavorite(!isFavorite)}
-          sx={{
-            position: 'absolute',
-            top: 20,
-            right: 20,
-            color: 'white',
-            bgcolor: 'rgba(255,255,255,0.2)',
-            '&:hover': { bgcolor: 'rgba(255,255,255,0.3)' },
-          }}
-        >
-          {isFavorite ? <Favorite /> : <FavoriteBorder />}
-        </IconButton>
       </Box>
 
-      <Container 
-        maxWidth="lg" 
-        sx={{ 
-          mt: -5,
-          mb: 8,
-          position: 'relative',
-          zIndex: 1,
-        }}
-      >
-        <Paper 
-          elevation={0}
-          sx={{ 
-            p: { xs: 2, sm: 3 },
-            borderRadius: 2,
-            bgcolor: 'background.paper',
+      {/* Restaurant Info */}
+      <Container maxWidth="lg" sx={{ mt: -4, position: 'relative' }}>
+        <Card sx={{ mb: 3, p: 3 }}>
+          <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+            <Info color="primary" />
+            <Typography variant="body1">
+              Welcome to our authentic Italian restaurant where we serve the finest
+              dishes made with fresh ingredients imported directly from Italy.
+            </Typography>
+          </Box>
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <LocalOffer color="error" />
+            <Typography variant="body1" color="error.main">
+              20% off on all main course dishes | Use code: ITALIAN20
+            </Typography>
+          </Box>
+        </Card>
+
+        {/* Menu Categories */}
+        <Tabs
+          value={selectedCategory}
+          onChange={handleCategoryChange}
+          variant="scrollable"
+          scrollButtons="auto"
+          sx={{
+            mb: 3,
+            '& .MuiTabs-indicator': {
+              height: 3,
+              borderRadius: '3px 3px 0 0',
+            },
           }}
         >
           {menuCategories.map((category) => (
-            <Box key={category.name} sx={{ mb: 4 }}>
-              <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
-                {category.name}
-              </Typography>
-              <AnimatePresence>
-                {category.items.map((item) => (
-                  <MenuItem
-                    key={item.id}
-                    item={item}
-                    onAddToCart={handleAddToCart}
-                  />
-                ))}
-              </AnimatePresence>
-            </Box>
+            <Tab
+              key={category.id}
+              value={category.id}
+              label={category.label}
+              sx={{
+                textTransform: 'none',
+                fontWeight: 600,
+                fontSize: '1rem',
+              }}
+            />
           ))}
-        </Paper>
+        </Tabs>
+
+        {/* Menu Items */}
+        <Grid container spacing={3}>
+          {getAllItems().map((item) => (
+            <Grid item xs={12} sm={6} md={4} key={item.id}>
+              <FoodCard food={item} />
+            </Grid>
+          ))}
+        </Grid>
       </Container>
-
-      {totalItems > 0 && (
-        <Fab
-          color="primary"
-          aria-label="cart"
-          onClick={() => setIsCartOpen(true)}
-          sx={{
-            position: 'fixed',
-            bottom: 16,
-            right: 16,
-            zIndex: 1000,
-          }}
-        >
-          <Badge badgeContent={totalItems} color="error">
-            <CartIcon />
-          </Badge>
-        </Fab>
-      )}
-
-      <CartDrawer
-        open={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        cartItems={cartItems}
-        onUpdateQuantity={handleUpdateCartQuantity}
-      />
     </Box>
   );
 };

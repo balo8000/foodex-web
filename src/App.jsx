@@ -7,6 +7,7 @@ import { ThemeProvider, createTheme } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import { CartProvider } from './contexts/CartContext';
 import { UserProvider } from './contexts/UserContext';
+import { UserDataProvider } from './contexts/UserDataContext';
 import { useUser } from './contexts/UserContext';
 import PageTransition from './components/PageTransition';
 
@@ -20,6 +21,9 @@ import RestaurantMenu from './pages/RestaurantMenu';
 import Cart from './pages/Cart';
 import Home from './pages/Home';
 import Profile from './pages/Profile';
+import Addresses from './pages/Addresses';
+import PaymentMethods from './pages/PaymentMethods';
+import OrderHistory from './pages/OrderHistory';
 import MainLayout from './components/MainLayout';
 
 const getTheme = (mode) => createTheme({
@@ -133,6 +137,36 @@ function AppContent() {
               </MainLayout>
             }
           />
+          <Route
+            path="/addresses"
+            element={
+              <MainLayout>
+                <PageTransition>
+                  <Addresses />
+                </PageTransition>
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/payment-methods"
+            element={
+              <MainLayout>
+                <PageTransition>
+                  <PaymentMethods />
+                </PageTransition>
+              </MainLayout>
+            }
+          />
+          <Route
+            path="/order-history"
+            element={
+              <MainLayout>
+                <PageTransition>
+                  <OrderHistory />
+                </PageTransition>
+              </MainLayout>
+            }
+          />
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
@@ -143,9 +177,11 @@ function AppContent() {
 function App() {
   return (
     <UserProvider>
-      <CartProvider>
-        <AppContent />
-      </CartProvider>
+      <UserDataProvider>
+        <CartProvider>
+          <AppContent />
+        </CartProvider>
+      </UserDataProvider>
     </UserProvider>
   );
 }

@@ -1,244 +1,207 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import {
   Box,
-  Container,
   Typography,
+  Container,
   Grid,
-  Paper,
-  useTheme,
+  Card,
+  CardContent,
   IconButton,
+  InputBase,
+  useTheme,
+  alpha,
+  Chip,
 } from '@mui/material';
-import { LocationOn, ArrowForward } from '@mui/icons-material';
+import { Search, LocalDining, LocalPizza, Restaurant, Fastfood } from '@mui/icons-material';
 import { motion } from 'framer-motion';
-import SearchBar from '../components/SearchBar';
-import Categories from '../components/home/Categories';
-import RestaurantCard from '../components/RestaurantCard';
-import TopNavBar from '../components/navigation/TopNavBar';
-import { useCart } from '../contexts/CartContext';
+import FoodCard from '../components/food/FoodCard';
 
-const restaurantsData = [
+const featuredItems = [
   {
     id: 1,
-    name: "Burger House",
-    image: "/images/burger.jpg",
+    name: 'Margherita Pizza',
+    description: 'Fresh tomatoes, mozzarella, basil, and extra virgin olive oil',
+    price: 12.99,
     rating: 4.5,
-    cuisine: "American",
-    deliveryTime: "20-30",
-    offer: "20% OFF"
+    reviews: 128,
+    image: '/images/pizza.jpg',
+    preparationTime: 20,
+    discount: 15,
   },
   {
     id: 2,
-    name: "Pizza Palace",
-    image: "/images/pizza.jpg",
-    rating: 4.7,
-    cuisine: "Italian",
-    deliveryTime: "25-35",
-    offer: "Free Delivery"
+    name: 'Beef Burger',
+    description: 'Premium beef patty with lettuce, tomato, cheese, and special sauce',
+    price: 9.99,
+    rating: 4.8,
+    reviews: 256,
+    image: '/images/burger.jpg',
+    preparationTime: 15,
   },
   {
     id: 3,
-    name: "Pasta Paradise",
-    image: "/images/pasta.jpg",
-    rating: 4.6,
-    cuisine: "Italian",
-    deliveryTime: "30-40"
+    name: 'Pasta Carbonara',
+    description: 'Creamy pasta with pancetta, eggs, parmesan, and black pepper',
+    price: 14.99,
+    rating: 4.7,
+    reviews: 189,
+    image: '/images/pasta.jpg',
+    preparationTime: 25,
+    discount: 10,
+  },
+];
+
+const categories = [
+  {
+    id: 1,
+    name: 'All',
+    icon: <LocalDining />,
+    color: '#FF5252',
+  },
+  {
+    id: 2,
+    name: 'Pizza',
+    icon: <LocalPizza />,
+    color: '#FF9800',
+  },
+  {
+    id: 3,
+    name: 'Restaurant',
+    icon: <Restaurant />,
+    color: '#4CAF50',
   },
   {
     id: 4,
-    name: "Steak House",
-    image: "/images/steak.jpg",
-    rating: 4.8,
-    cuisine: "American",
-    deliveryTime: "35-45",
-    offer: "New"
-  }
-];
-
-const featuredLocations = [
-  { name: 'Manhattan', count: 150 },
-  { name: 'Brooklyn', count: 120 },
-  { name: 'Queens', count: 90 },
-  { name: 'Bronx', count: 70 },
+    name: 'Fast Food',
+    icon: <Fastfood />,
+    color: '#2196F3',
+  },
 ];
 
 const Home = () => {
   const theme = useTheme();
-  const { cartItems } = useCart();
-  const [restaurants, setRestaurants] = useState(restaurantsData);
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
 
-  const filteredRestaurants = useMemo(() => {
-    return restaurants.filter(restaurant => {
-      const matchesSearch = restaurant.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        restaurant.cuisine.toLowerCase().includes(searchQuery.toLowerCase());
-      const matchesCategory = selectedCategory === 'All' || restaurant.cuisine.includes(selectedCategory);
-      return matchesSearch && matchesCategory;
-    });
-  }, [restaurants, searchQuery, selectedCategory]);
-
-  const handleSearch = (query) => {
-    setSearchQuery(query);
-  };
-
-  const handleCategorySelect = (category) => {
-    setSelectedCategory(category);
-  };
-
   return (
-    <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-      <TopNavBar cartItemCount={cartItems.length} />
-      
-      <Container 
-        maxWidth="lg" 
-        sx={{ 
-          pt: { xs: 8, sm: 9 },
-          pb: 8,
-          px: { xs: 1, sm: 2 },
-        }}
-      >
-        {/* Hero Section */}
-        <Box 
-          sx={{ 
-            mb: 4,
-            mt: 2,
-            p: { xs: 2, sm: 3 },
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h4" component="h1" gutterBottom fontWeight="bold">
+          What would you like
+          <br /> to eat today?
+        </Typography>
+
+        <Card
+          sx={{
+            p: 1,
+            display: 'flex',
+            alignItems: 'center',
+            bgcolor: alpha(theme.palette.primary.main, 0.05),
+            border: `1px solid ${alpha(theme.palette.primary.main, 0.1)}`,
             borderRadius: 2,
-            bgcolor: 'primary.main',
-            color: 'white',
-            position: 'relative',
-            overflow: 'hidden',
           }}
         >
-          <Box
-            sx={{
-              position: 'absolute',
-              top: 0,
-              right: 0,
-              width: { xs: '150px', sm: '200px' },
-              height: '100%',
-              backgroundImage: 'url(/images/hero-pattern.png)',
-              backgroundSize: 'cover',
-              opacity: 0.1,
-            }}
+          <IconButton>
+            <Search />
+          </IconButton>
+          <InputBase
+            placeholder="Search for food..."
+            sx={{ ml: 1, flex: 1 }}
           />
-          <Typography 
-            variant="h4" 
-            sx={{ 
-              fontWeight: 700,
-              mb: 1,
-              fontSize: { xs: '1.75rem', sm: '2.5rem' },
-            }}
-          >
-            Hungry?
-          </Typography>
-          <Typography 
-            variant="h6" 
-            sx={{ 
-              fontWeight: 400,
-              mb: 2,
-              fontSize: { xs: '1rem', sm: '1.25rem' },
-            }}
-          >
-            Order food from your favorite restaurants
-          </Typography>
-          <SearchBar onSearch={handleSearch} />
-        </Box>
+        </Card>
+      </Box>
 
-        {/* Categories Section */}
-        <Box sx={{ mb: 4 }}>
-          <Typography 
-            variant="h6" 
-            sx={{ 
-              mb: 2,
-              px: 1,
-              fontWeight: 600,
-            }}
-          >
-            Categories
-          </Typography>
-          <Categories onSelect={handleCategorySelect} />
-        </Box>
-
-        {/* Featured Locations */}
-        <Box sx={{ mb: 4 }}>
-          <Typography 
-            variant="h6" 
-            sx={{ 
-              mb: 2,
-              px: 1,
-              fontWeight: 600,
-            }}
-          >
-            Popular Locations
-          </Typography>
-          <Grid container spacing={2}>
-            {featuredLocations.map((location, index) => (
-              <Grid item xs={6} sm={3} key={location.name}>
-                <Paper
-                  component={motion.div}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.1 }}
-                  elevation={0}
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h6" gutterBottom fontWeight="bold">
+          Categories
+        </Typography>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 2,
+            overflowX: 'auto',
+            pb: 2,
+            '::-webkit-scrollbar': {
+              display: 'none',
+            },
+          }}
+        >
+          {categories.map((category) => (
+            <motion.div
+              key={category.id}
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
+              <Card
+                onClick={() => setSelectedCategory(category.name)}
+                sx={{
+                  minWidth: 100,
+                  cursor: 'pointer',
+                  bgcolor:
+                    selectedCategory === category.name
+                      ? alpha(category.color, 0.1)
+                      : 'background.paper',
+                  borderColor:
+                    selectedCategory === category.name
+                      ? category.color
+                      : 'divider',
+                  borderWidth: 1,
+                  borderStyle: 'solid',
+                }}
+              >
+                <CardContent
                   sx={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    alignItems: 'center',
                     p: 2,
-                    textAlign: 'center',
-                    borderRadius: 2,
-                    bgcolor: 'background.paper',
-                    cursor: 'pointer',
-                    '&:hover': {
-                      bgcolor: 'action.hover',
-                    },
+                    '&:last-child': { pb: 2 },
                   }}
                 >
-                  <LocationOn color="primary" sx={{ fontSize: 40, mb: 1 }} />
-                  <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-                    {location.name}
+                  <Box
+                    sx={{
+                      color: category.color,
+                      mb: 1,
+                    }}
+                  >
+                    {category.icon}
+                  </Box>
+                  <Typography variant="body2" align="center">
+                    {category.name}
                   </Typography>
-                  <Typography variant="body2" color="text.secondary">
-                    {location.count}+ Places
-                  </Typography>
-                </Paper>
-              </Grid>
-            ))}
-          </Grid>
+                </CardContent>
+              </Card>
+            </motion.div>
+          ))}
         </Box>
+      </Box>
 
-        {/* Restaurants Section */}
-        <Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, px: 1 }} >
-            <Typography 
-              variant="h6" 
-              sx={{ fontWeight: 600 }}
-            >
-              Popular Restaurants
-            </Typography>
-            <IconButton color="primary">
-              <ArrowForward />
-            </IconButton>
-          </Box>
-          <Grid container spacing={2}>
-            {filteredRestaurants.map((restaurant, index) => (
-              <Grid 
-                item 
-                xs={12} 
-                sm={6} 
-                md={4} 
-                lg={3} 
-                key={index}
-                component={motion.div}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1 }}
-              >
-                <RestaurantCard {...restaurant} />
-              </Grid>
-            ))}
-          </Grid>
+      <Box sx={{ mb: 4 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            mb: 2,
+          }}
+        >
+          <Typography variant="h6" gutterBottom fontWeight="bold">
+            Featured Items
+          </Typography>
+          <Chip
+            label="See All"
+            onClick={() => {/* Navigate to menu */}}
+            variant="outlined"
+          />
         </Box>
-      </Container>
-    </Box>
+        <Grid container spacing={3}>
+          {featuredItems.map((item) => (
+            <Grid item xs={12} sm={6} md={4} key={item.id}>
+              <FoodCard food={item} />
+            </Grid>
+          ))}
+        </Grid>
+      </Box>
+    </Container>
   );
 };
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -13,6 +13,7 @@ import {
   Divider,
   useTheme,
   alpha,
+  Badge,
 } from '@mui/material';
 import {
   Edit,
@@ -25,9 +26,11 @@ import {
   DarkMode,
   Help,
   ExitToApp,
+  PhotoCamera,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useUser } from '../contexts/UserContext';
+import { useUserData } from '../contexts/UserDataContext';
 
 const ProfileSection = ({ title, children }) => (
   <Card sx={{ mb: 2, borderRadius: 2 }}>
@@ -44,7 +47,9 @@ const Profile = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const { user, updatePreferences, logout } = useUser();
+  const { updateProfileImage } = useUserData();
   const [isEditing, setIsEditing] = useState(false);
+  const fileInputRef = useRef();
   const [profileData, setProfileData] = useState({
     name: user?.name || 'John Doe',
     email: user?.email || 'john.doe@example.com',
@@ -64,6 +69,17 @@ const Profile = () => {
   const handleLogout = () => {
     logout();
     navigate('/');
+  };
+
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        updateProfileImage(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   return (
@@ -91,14 +107,39 @@ const Profile = () => {
               transform: 'translateX(-50%)',
             }}
           >
-            <Avatar
-              src={user?.avatar}
-              sx={{
-                width: 80,
-                height: 80,
-                border: `4px solid ${theme.palette.background.paper}`,
-                boxShadow: theme.shadows[3],
-              }}
+            <Badge
+              overlap="circular"
+              anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
+              badgeContent={
+                <IconButton
+                  sx={{
+                    bgcolor: 'background.paper',
+                    boxShadow: theme.shadows[2],
+                    '&:hover': { bgcolor: 'background.paper' },
+                  }}
+                  size="small"
+                  onClick={() => fileInputRef.current.click()}
+                >
+                  <PhotoCamera fontSize="small" />
+                </IconButton>
+              }
+            >
+              <Avatar
+                src={user?.avatar}
+                sx={{
+                  width: 80,
+                  height: 80,
+                  border: `4px solid ${theme.palette.background.paper}`,
+                  boxShadow: theme.shadows[3],
+                }}
+              />
+            </Badge>
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleImageUpload}
+              accept="image/*"
+              style={{ display: 'none' }}
             />
           </Box>
 
