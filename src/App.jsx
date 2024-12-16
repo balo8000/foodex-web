@@ -92,58 +92,47 @@ function AppContent() {
       <Router>
         <Routes>
           <Route path="/" element={<SplashScreen />} />
-          <Route path="/welcome" element={<WelcomeScreen />} />
-          <Route path="/auth" element={<AuthOptions />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
           <Route
             path="/home"
             element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <PageTransition>
-                    <Home />
-                  </PageTransition>
-                </MainLayout>
-              </ProtectedRoute>
+              <MainLayout>
+                <PageTransition>
+                  <Home />
+                </PageTransition>
+              </MainLayout>
             }
           />
           <Route
             path="/menu"
             element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <PageTransition>
-                    <RestaurantMenu />
-                  </PageTransition>
-                </MainLayout>
-              </ProtectedRoute>
+              <MainLayout>
+                <PageTransition>
+                  <RestaurantMenu />
+                </PageTransition>
+              </MainLayout>
             }
           />
           <Route
             path="/cart"
             element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <PageTransition>
-                    <Cart />
-                  </PageTransition>
-                </MainLayout>
-              </ProtectedRoute>
+              <MainLayout>
+                <PageTransition>
+                  <Cart />
+                </PageTransition>
+              </MainLayout>
             }
           />
           <Route
             path="/profile"
             element={
-              <ProtectedRoute>
-                <MainLayout>
-                  <PageTransition>
-                    <Profile />
-                  </PageTransition>
-                </MainLayout>
-              </ProtectedRoute>
+              <MainLayout>
+                <PageTransition>
+                  <Profile />
+                </PageTransition>
+              </MainLayout>
             }
           />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </Router>
     </ThemeProvider>
