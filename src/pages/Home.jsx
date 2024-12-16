@@ -4,8 +4,11 @@ import {
   Container,
   Typography,
   Grid,
+  Paper,
   useTheme,
+  IconButton,
 } from '@mui/material';
+import { LocationOn, ArrowForward } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import SearchBar from '../components/SearchBar';
 import Categories from '../components/home/Categories';
@@ -46,6 +49,13 @@ const restaurantsData = [
   },
 ];
 
+const featuredLocations = [
+  { name: 'Manhattan', count: 150 },
+  { name: 'Brooklyn', count: 120 },
+  { name: 'Queens', count: 90 },
+  { name: 'Bronx', count: 70 },
+];
+
 const Home = () => {
   const theme = useTheme();
   const [restaurants, setRestaurants] = useState(restaurantsData);
@@ -71,7 +81,7 @@ const Home = () => {
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-      <TopNavBar title="Foodex" cartItemCount={0} />
+      <TopNavBar cartItemCount={0} />
       
       <Container 
         maxWidth="lg" 
@@ -81,27 +91,62 @@ const Home = () => {
           px: { xs: 1, sm: 2 },
         }}
       >
-        <Box sx={{ mb: 3 }}>
+        {/* Hero Section */}
+        <Box 
+          sx={{ 
+            mb: 4,
+            mt: 2,
+            p: { xs: 2, sm: 3 },
+            borderRadius: 2,
+            bgcolor: 'primary.main',
+            color: 'white',
+            position: 'relative',
+            overflow: 'hidden',
+          }}
+        >
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              right: 0,
+              width: { xs: '150px', sm: '200px' },
+              height: '100%',
+              backgroundImage: 'url(/images/hero-pattern.png)',
+              backgroundSize: 'cover',
+              opacity: 0.1,
+            }}
+          />
           <Typography 
-            variant="h5" 
+            variant="h4" 
             sx={{ 
-              fontWeight: 600,
-              mb: 2,
-              px: 1,
+              fontWeight: 700,
+              mb: 1,
+              fontSize: { xs: '1.75rem', sm: '2.5rem' },
             }}
           >
-            What would you like to eat?
+            Hungry?
+          </Typography>
+          <Typography 
+            variant="h6" 
+            sx={{ 
+              fontWeight: 400,
+              mb: 2,
+              fontSize: { xs: '1rem', sm: '1.25rem' },
+            }}
+          >
+            Order food from your favorite restaurants
           </Typography>
           <SearchBar onSearch={handleSearch} />
         </Box>
 
-        <Box sx={{ mb: 3 }}>
+        {/* Categories Section */}
+        <Box sx={{ mb: 4 }}>
           <Typography 
             variant="h6" 
             sx={{ 
-              mb: 1,
+              mb: 2,
               px: 1,
-              fontWeight: 500,
+              fontWeight: 600,
             }}
           >
             Categories
@@ -109,22 +154,69 @@ const Home = () => {
           <Categories onSelect={handleCategorySelect} />
         </Box>
 
-        <Box>
+        {/* Featured Locations */}
+        <Box sx={{ mb: 4 }}>
           <Typography 
             variant="h6" 
             sx={{ 
               mb: 2,
               px: 1,
-              fontWeight: 500,
+              fontWeight: 600,
             }}
           >
-            Popular Restaurants
+            Popular Locations
           </Typography>
-          <Grid container spacing={1.5}>
+          <Grid container spacing={2}>
+            {featuredLocations.map((location, index) => (
+              <Grid item xs={6} sm={3} key={location.name}>
+                <Paper
+                  component={motion.div}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  elevation={0}
+                  sx={{
+                    p: 2,
+                    textAlign: 'center',
+                    borderRadius: 2,
+                    bgcolor: 'background.paper',
+                    cursor: 'pointer',
+                    '&:hover': {
+                      bgcolor: 'action.hover',
+                    },
+                  }}
+                >
+                  <LocationOn color="primary" sx={{ fontSize: 40, mb: 1 }} />
+                  <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
+                    {location.name}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    {location.count}+ Places
+                  </Typography>
+                </Paper>
+              </Grid>
+            ))}
+          </Grid>
+        </Box>
+
+        {/* Restaurants Section */}
+        <Box>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, px: 1 }}>
+            <Typography 
+              variant="h6" 
+              sx={{ fontWeight: 600 }}
+            >
+              Popular Restaurants
+            </Typography>
+            <IconButton color="primary">
+              <ArrowForward />
+            </IconButton>
+          </Box>
+          <Grid container spacing={2}>
             {filteredRestaurants.map((restaurant, index) => (
               <Grid 
                 item 
-                xs={6} 
+                xs={12} 
                 sm={6} 
                 md={4} 
                 lg={3} 
