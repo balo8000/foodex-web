@@ -1,4 +1,4 @@
-import { createContext, useState, useContext } from 'react';
+import { createContext, useState, useContext, useCallback } from 'react';
 
 const CartContext = createContext();
 
@@ -13,7 +13,7 @@ export const useCart = () => {
 export const CartProvider = ({ children }) => {
   const [cartItems, setCartItems] = useState([]);
 
-  const addToCart = (newItem) => {
+  const addToCart = useCallback((newItem) => {
     setCartItems((prev) => {
       const existingItem = prev.find((item) => item.id === newItem.id);
       if (existingItem) {
@@ -25,45 +25,57 @@ export const CartProvider = ({ children }) => {
       }
       return [...prev, { ...newItem, quantity: 1 }];
     });
-  };
+  }, []);
 
-  const removeFromCart = (itemId) => {
-    setCartItems((prev) => prev.filter((item) => item.id !== itemId));
-  };
+  const removeFromCart = useCallback((itemId) => {
+    setCartItems((prev) => {
+      const existingItem = prev.find((item) => item.id === itemId);
+      if (existingItem && existingItem.quantity > 1) {
+        return prev.map((item) =>
+          item.id === itemId
+            ? { ...item, quantity: item.quantity - 1 }
+            : item
+        );
+      }
+      return prev.filter((item) => item.id !== itemId);
+    });
+  }, []);
 
-  const updateQuantity = (itemId, quantity) => {
-    if (quantity < 1) {
-      removeFromCart(itemId);
-      return;
-    }
-    setCartItems((prev) =>
-      prev.map((item) =>
-        item.id === itemId ? { ...item, quantity } : item
-      )
-    );
-  };
-
-  const clearCart = () => {
+  const clearCart = useCallback(() => {
     setCartItems([]);
-  };
+  }, []);
 
-  const getCartTotal = () => {
-    return cartItems.reduce((total, item) => total + (item.price * (item.quantity || 1)), 0);
-  };
+  const getItemQuantity = useCallback((itemId) => {
+    const item = cartItems.find((item) => item.id === itemId);
+    return item ? item.quantity : 0;
+  }, [cartItems]);
 
-  const getItemCount = () => {
-    return cartItems.reduce((count, item) => count + (item.quantity || 1), 0);
-  };
+  const getTotalPrice = useCallback(() => {
+    return cartItems.reduce((total, item) => {
+      const price = parseFloat(item.price);
+      return total + price * item.quantity;
+    }, 0);
+  }, [cartItems]);
 
-  const value = {
-    cartItems,
-    addToCart,
-    removeFromCart,
-    updateQuantity,
-    clearCart,
-    getCartTotal,
-    getItemCount,
-  };
+  const getTotalItems = useCallback(() => {
+    return cartItems.reduce((total, item) => total + item.quantity, 0);
+  }, [cartItems]);
 
-  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
+  return (
+    <CartContext.Provider
+      value={{
+        cartItems,
+        addToCart,
+        removeFromCart,
+        clearCart,
+        getItemQuantity,
+        getTotalPrice,
+        getTotalItems,
+      }}
+    >
+      {children}
+    </CartContext.Provider>
+  );
 };
+
+export default CartProvider;

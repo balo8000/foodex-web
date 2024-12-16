@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import {
   Card,
   CardMedia,
@@ -22,241 +22,185 @@ import {
   Timer,
   LocalOffer,
 } from '@mui/icons-material';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useCart } from '../../contexts/CartContext';
 
 const FoodCard = ({ food, variant = 'default' }) => {
   const theme = useTheme();
-  const { addToCart, removeFromCart, cart } = useCart();
+  const { addToCart, removeFromCart, getItemQuantity } = useCart();
   const [favorite, setFavorite] = useState(false);
-  const [expanded, setExpanded] = useState(false);
+  const quantity = getItemQuantity(food.id);
 
-  const cartItem = cart.find((item) => item.id === food.id);
-  const quantity = cartItem ? cartItem.quantity : 0;
+  const handleAddToCart = useCallback(() => {
+    addToCart(food);
+  }, [addToCart, food]);
 
-  const handleAddToCart = () => {
-    addToCart({
-      id: food.id,
-      name: food.name,
-      price: food.price,
-      image: food.image,
-      quantity: 1,
-    });
-  };
-
-  const handleRemoveFromCart = () => {
+  const handleRemoveFromCart = useCallback(() => {
     removeFromCart(food.id);
-  };
+  }, [removeFromCart, food.id]);
+
+  const handleFavoriteClick = useCallback(() => {
+    setFavorite((prev) => !prev);
+  }, []);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.3 }}
+    <Card
+      component={motion.div}
+      whileHover={{ scale: 1.02 }}
+      sx={{
+        display: 'flex',
+        flexDirection: 'column',
+        height: '100%',
+        position: 'relative',
+        overflow: 'visible',
+        borderRadius: 2,
+        boxShadow: theme.shadows[2],
+      }}
     >
-      <Card
+      {food.discount && (
+        <Chip
+          icon={<LocalOffer />}
+          label={`${food.discount}% OFF`}
+          color="error"
+          size="small"
+          sx={{
+            position: 'absolute',
+            top: 8,
+            right: 8,
+            zIndex: 1,
+          }}
+        />
+      )}
+
+      <IconButton
+        onClick={handleFavoriteClick}
         sx={{
-          height: variant === 'compact' ? '100%' : 'auto',
-          display: 'flex',
-          flexDirection: variant === 'compact' ? 'row' : 'column',
-          position: 'relative',
-          overflow: 'visible',
+          position: 'absolute',
+          top: 8,
+          left: 8,
+          zIndex: 1,
+          bgcolor: alpha(theme.palette.background.paper, 0.8),
           '&:hover': {
-            transform: 'translateY(-4px)',
-            boxShadow: theme.shadows[8],
-            transition: 'all 0.3s ease-in-out',
+            bgcolor: alpha(theme.palette.background.paper, 0.9),
           },
         }}
       >
+        {favorite ? (
+          <Favorite color="error" />
+        ) : (
+          <FavoriteBorder color="action" />
+        )}
+      </IconButton>
+
+      <CardMedia
+        component="img"
+        image={food.image}
+        alt={food.name}
+        sx={{
+          height: variant === 'compact' ? 120 : 180,
+          objectFit: 'cover',
+        }}
+      />
+
+      <CardContent sx={{ flexGrow: 1, pb: 1 }}>
+        <Typography variant="h6" gutterBottom>
+          {food.name}
+        </Typography>
+
+        <Typography
+          variant="body2"
+          color="text.secondary"
+          sx={{
+            display: '-webkit-box',
+            WebkitLineClamp: 2,
+            WebkitBoxOrient: 'vertical',
+            overflow: 'hidden',
+            mb: 1,
+          }}
+        >
+          {food.description}
+        </Typography>
+
         <Box
           sx={{
-            position: 'relative',
-            width: variant === 'compact' ? 120 : '100%',
-            height: variant === 'compact' ? 120 : 200,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            mb: 1,
           }}
         >
-          <CardMedia
-            component="img"
-            image={food.image}
-            alt={food.name}
-            sx={{
-              height: '100%',
-              objectFit: 'cover',
-            }}
-          />
-          <IconButton
-            sx={{
-              position: 'absolute',
-              top: 8,
-              right: 8,
-              bgcolor: alpha(theme.palette.background.paper, 0.9),
-              '&:hover': {
-                bgcolor: alpha(theme.palette.background.paper, 1),
-              },
-            }}
-            onClick={() => setFavorite(!favorite)}
-          >
-            {favorite ? (
-              <Favorite color="error" />
-            ) : (
-              <FavoriteBorder color="action" />
-            )}
-          </IconButton>
-          {food.discount && (
-            <Chip
-              label={`${food.discount}% OFF`}
-              color="error"
-              size="small"
-              sx={{
-                position: 'absolute',
-                top: 8,
-                left: 8,
-              }}
-            />
-          )}
+          <Rating value={food.rating} readOnly size="small" />
+          <Typography variant="body2" color="text.secondary">
+            ({food.ratingCount})
+          </Typography>
         </Box>
 
-        <CardContent
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Timer fontSize="small" color="action" />
+          <Typography variant="body2" color="text.secondary">
+            {food.prepTime} mins
+          </Typography>
+        </Box>
+
+        <Box
           sx={{
-            flex: 1,
-            p: variant === 'compact' ? 1 : 2,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            mt: 2,
           }}
         >
-          <Typography
-            variant={variant === 'compact' ? 'body1' : 'h6'}
-            component="h2"
-            fontWeight="bold"
-            gutterBottom
-          >
-            {food.name}
+          <Typography variant="h6" color="primary">
+            ${food.price}
           </Typography>
 
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-              mb: 1,
-            }}
-          >
-            <Rating value={food.rating} readOnly size="small" />
-            <Typography variant="body2" color="text.secondary">
-              ({food.reviews})
-            </Typography>
-          </Box>
-
-          {variant !== 'compact' && (
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{
-                mb: 2,
-                display: '-webkit-box',
-                WebkitLineClamp: expanded ? 'unset' : 2,
-                WebkitBoxOrient: 'vertical',
-                overflow: 'hidden',
-                cursor: 'pointer',
-              }}
-              onClick={() => setExpanded(!expanded)}
-            >
-              {food.description}
-            </Typography>
-          )}
-
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              flexWrap: 'wrap',
-              gap: 1,
-            }}
-          >
-            <Box>
-              <Typography
-                variant={variant === 'compact' ? 'body1' : 'h6'}
-                component="span"
-                color="primary"
-                fontWeight="bold"
-              >
-                ${food.price.toFixed(2)}
-              </Typography>
-              {food.discount && (
-                <Typography
-                  variant="body2"
-                  component="span"
-                  color="text.secondary"
-                  sx={{ textDecoration: 'line-through', ml: 1 }}
-                >
-                  ${(food.price * (1 + food.discount / 100)).toFixed(2)}
-                </Typography>
-              )}
-            </Box>
-
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-              {food.preparationTime && (
-                <Chip
-                  icon={<Timer fontSize="small" />}
-                  label={`${food.preparationTime} min`}
-                  size="small"
-                  variant="outlined"
-                />
-              )}
-            </Box>
-          </Box>
-
-          <Box
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              mt: 2,
-            }}
-          >
+          <AnimatePresence initial={false}>
             {quantity > 0 ? (
               <Box
+                component={motion.div}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0 }}
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
                   gap: 1,
-                  bgcolor: alpha(theme.palette.primary.main, 0.1),
-                  borderRadius: 2,
-                  p: 0.5,
                 }}
               >
                 <IconButton
                   size="small"
                   onClick={handleRemoveFromCart}
-                  color="primary"
+                  sx={{ bgcolor: alpha(theme.palette.primary.main, 0.1) }}
                 >
                   <Remove fontSize="small" />
                 </IconButton>
-                <Typography variant="body1" fontWeight="medium">
-                  {quantity}
-                </Typography>
+                <Typography variant="body1">{quantity}</Typography>
                 <IconButton
                   size="small"
                   onClick={handleAddToCart}
-                  color="primary"
+                  sx={{ bgcolor: alpha(theme.palette.primary.main, 0.1) }}
                 >
                   <Add fontSize="small" />
                 </IconButton>
               </Box>
             ) : (
               <Button
+                component={motion.button}
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                exit={{ scale: 0 }}
                 variant="contained"
+                size="small"
                 startIcon={<ShoppingCart />}
                 onClick={handleAddToCart}
-                fullWidth
-                sx={{ borderRadius: 2 }}
               >
-                Add to Cart
+                Add
               </Button>
             )}
-          </Box>
-        </CardContent>
-      </Card>
-    </motion.div>
+          </AnimatePresence>
+        </Box>
+      </CardContent>
+    </Card>
   );
 };
 

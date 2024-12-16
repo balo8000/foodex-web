@@ -1,10 +1,8 @@
-import { useState, useMemo } from 'react'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { ThemeProvider, createTheme } from '@mui/material';
-import CssBaseline from '@mui/material/CssBaseline';
 import { CartProvider } from './contexts/CartContext';
 import { UserProvider } from './contexts/UserContext';
 import { UserDataProvider } from './contexts/UserDataContext';
@@ -176,13 +174,18 @@ function AppContent() {
 
 function App() {
   return (
-    <UserProvider>
-      <UserDataProvider>
-        <CartProvider>
-          <AppContent />
-        </CartProvider>
-      </UserDataProvider>
-    </UserProvider>
+    <Router>
+      <ThemeProvider theme={createTheme()}>
+        <CssBaseline />
+        <UserDataProvider>
+          <CartProvider>
+            <UserProvider>
+              <AppContent />
+            </UserProvider>
+          </CartProvider>
+        </UserDataProvider>
+      </ThemeProvider>
+    </Router>
   );
 }
 
