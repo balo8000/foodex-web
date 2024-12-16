@@ -1,3 +1,4 @@
+import { useState, useMemo } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
 import reactLogo from './assets/react.svg'
@@ -24,25 +25,16 @@ import PaymentMethods from './pages/PaymentMethods';
 import OrderHistory from './pages/OrderHistory';
 import MainLayout from './components/MainLayout';
 
-const getTheme = (mode) => createTheme({
+const theme = createTheme({
   palette: {
-    mode,
     primary: {
       main: '#4CAF50',
-      light: mode === 'dark' ? '#81C784' : '#E8F5E9',
+      light: '#81C784',
       dark: '#388E3C',
       contrastText: '#fff',
     },
-    background: {
-      default: mode === 'dark' ? '#121212' : '#F5F5F5',
-      paper: mode === 'dark' ? '#1E1E1E' : '#FFFFFF',
-    },
     error: {
       main: '#FF4B3A',
-    },
-    text: {
-      primary: mode === 'dark' ? '#fff' : 'rgba(0, 0, 0, 0.87)',
-      secondary: mode === 'dark' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)',
     },
   },
   typography: {
@@ -67,123 +59,104 @@ const getTheme = (mode) => createTheme({
         },
       },
     },
-    MuiPaper: {
-      styleOverrides: {
-        root: {
-          backgroundImage: 'none',
-        },
-      },
-    },
   },
 });
 
-const ProtectedRoute = ({ children }) => {
-  // Add your authentication logic here
-  const isAuthenticated = true; // For demo purposes
-  return isAuthenticated ? children : <Navigate to="/welcome" />;
-};
-
-function AppContent() {
-  const [mode, setMode] = useState('light');
-  const { user } = useUser();
-  const theme = useMemo(() => getTheme(user?.preferences?.darkMode ? 'dark' : mode), [user?.preferences?.darkMode, mode]);
-
+function AppRoutes() {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Router>
-        <Routes>
-          <Route path="/" element={<SplashScreen />} />
-          <Route path="/welcome" element={<WelcomeScreen />} />
-          <Route
-            path="/home"
-            element={
-              <MainLayout>
-                <PageTransition>
-                  <Home />
-                </PageTransition>
-              </MainLayout>
-            }
-          />
-          <Route
-            path="/menu"
-            element={
-              <MainLayout>
-                <PageTransition>
-                  <RestaurantMenu />
-                </PageTransition>
-              </MainLayout>
-            }
-          />
-          <Route
-            path="/cart"
-            element={
-              <MainLayout>
-                <PageTransition>
-                  <Cart />
-                </PageTransition>
-              </MainLayout>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <MainLayout>
-                <PageTransition>
-                  <Profile />
-                </PageTransition>
-              </MainLayout>
-            }
-          />
-          <Route
-            path="/addresses"
-            element={
-              <MainLayout>
-                <PageTransition>
-                  <Addresses />
-                </PageTransition>
-              </MainLayout>
-            }
-          />
-          <Route
-            path="/payment-methods"
-            element={
-              <MainLayout>
-                <PageTransition>
-                  <PaymentMethods />
-                </PageTransition>
-              </MainLayout>
-            }
-          />
-          <Route
-            path="/order-history"
-            element={
-              <MainLayout>
-                <PageTransition>
-                  <OrderHistory />
-                </PageTransition>
-              </MainLayout>
-            }
-          />
-          <Route path="*" element={<Navigate to="/" replace />} />
-        </Routes>
-      </Router>
-    </ThemeProvider>
+    <Routes>
+      <Route path="/" element={<SplashScreen />} />
+      <Route path="/welcome" element={<WelcomeScreen />} />
+      <Route path="/auth" element={<AuthOptions />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/signup" element={<SignUp />} />
+      <Route
+        path="/home"
+        element={
+          <MainLayout>
+            <PageTransition>
+              <Home />
+            </PageTransition>
+          </MainLayout>
+        }
+      />
+      <Route
+        path="/menu"
+        element={
+          <MainLayout>
+            <PageTransition>
+              <RestaurantMenu />
+            </PageTransition>
+          </MainLayout>
+        }
+      />
+      <Route
+        path="/cart"
+        element={
+          <MainLayout>
+            <PageTransition>
+              <Cart />
+            </PageTransition>
+          </MainLayout>
+        }
+      />
+      <Route
+        path="/profile"
+        element={
+          <MainLayout>
+            <PageTransition>
+              <Profile />
+            </PageTransition>
+          </MainLayout>
+        }
+      />
+      <Route
+        path="/addresses"
+        element={
+          <MainLayout>
+            <PageTransition>
+              <Addresses />
+            </PageTransition>
+          </MainLayout>
+        }
+      />
+      <Route
+        path="/payment-methods"
+        element={
+          <MainLayout>
+            <PageTransition>
+              <PaymentMethods />
+            </PageTransition>
+          </MainLayout>
+        }
+      />
+      <Route
+        path="/order-history"
+        element={
+          <MainLayout>
+            <PageTransition>
+              <OrderHistory />
+            </PageTransition>
+          </MainLayout>
+        }
+      />
+      <Route path="*" element={<Navigate to="/" replace />} />
+    </Routes>
   );
 }
 
 function App() {
   return (
     <Router>
-      <ThemeProvider theme={createTheme()}>
+      <ThemeProvider theme={theme}>
         <CssBaseline />
-        <UserDataProvider>
-          <CartProvider>
-            <UserProvider>
-              <AppContent />
-            </UserProvider>
-          </CartProvider>
-        </UserDataProvider>
+        <UserProvider>
+          <UserDataProvider>
+            <CartProvider>
+              <AppRoutes />
+            </CartProvider>
+          </UserDataProvider>
+        </UserProvider>
       </ThemeProvider>
     </Router>
   );
