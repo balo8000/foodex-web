@@ -5,9 +5,9 @@ import './App.css'
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ThemeProvider, createTheme } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
-import { CartProvider } from './context/CartContext';
-import { UserProvider } from './context/UserContext';
-import { useUser } from './context/UserContext';
+import { CartProvider } from './contexts/CartContext';
+import { UserProvider } from './contexts/UserContext';
+import { useUser } from './contexts/UserContext';
 import PageTransition from './components/PageTransition';
 
 // Pages

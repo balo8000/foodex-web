@@ -14,9 +14,11 @@ import SearchBar from '../components/SearchBar';
 import Categories from '../components/home/Categories';
 import RestaurantCard from '../components/RestaurantCard';
 import TopNavBar from '../components/navigation/TopNavBar';
+import { useCart } from '../contexts/CartContext';
 
 const restaurantsData = [
   {
+    id: 1,
     name: 'Jollof House',
     image: '/images/jollof-rice.jpg',
     rating: 4.8,
@@ -25,6 +27,7 @@ const restaurantsData = [
     offer: '15% OFF',
   },
   {
+    id: 2,
     name: 'Pounded Yam Paradise',
     image: '/images/pounded-yam.jpg',
     rating: 4.9,
@@ -33,6 +36,7 @@ const restaurantsData = [
     offer: 'Free Soup Extra',
   },
   {
+    id: 3,
     name: 'Suya Spot',
     image: '/images/suya.jpg',
     rating: 4.7,
@@ -40,6 +44,7 @@ const restaurantsData = [
     deliveryTime: 25,
   },
   {
+    id: 4,
     name: 'Egusi Kitchen',
     image: '/images/egusi-soup.jpg',
     rating: 4.6,
@@ -58,6 +63,7 @@ const featuredLocations = [
 
 const Home = () => {
   const theme = useTheme();
+  const { cartItems } = useCart();
   const [restaurants, setRestaurants] = useState(restaurantsData);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -81,7 +87,7 @@ const Home = () => {
 
   return (
     <Box sx={{ minHeight: '100vh', bgcolor: 'background.default' }}>
-      <TopNavBar cartItemCount={0} />
+      <TopNavBar cartItemCount={cartItems.length} />
       
       <Container 
         maxWidth="lg" 
@@ -201,7 +207,7 @@ const Home = () => {
 
         {/* Restaurants Section */}
         <Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, px: 1 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2, px: 1 }} >
             <Typography 
               variant="h6" 
               sx={{ fontWeight: 600 }}
