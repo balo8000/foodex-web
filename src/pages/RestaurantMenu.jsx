@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import {
   AccessTime,
-  Delivery,
+  LocalShipping as Delivery,
   Info,
   LocalOffer,
   Star,
