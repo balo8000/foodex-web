@@ -6,11 +6,12 @@ import { categories } from '../../data/homeData';
 const CategoryContainer = styled(Box)(({ theme }) => ({
   display: 'grid',
   gridTemplateColumns: 'repeat(4, 1fr)',
-  gap: theme.spacing(1.5),
-  padding: theme.spacing(0, 2),
+  gap: theme.spacing(2),
+  padding: theme.spacing(2),
   [theme.breakpoints.down('sm')]: {
-    gridTemplateColumns: 'repeat(4, 1fr)',
-    gap: theme.spacing(1),
+    gridTemplateColumns: 'repeat(2, 1fr)',
+    gap: theme.spacing(2),
+    padding: theme.spacing(2),
   },
 }));
 
@@ -19,24 +20,31 @@ const CategoryItem = styled(motion.div)(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',
   cursor: 'pointer',
-  padding: theme.spacing(1),
+  padding: theme.spacing(2),
+  backgroundColor: theme.palette.background.paper,
+  borderRadius: theme.shape.borderRadius,
+  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+  transition: 'all 0.3s ease',
+  '&:hover': {
+    boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
+  },
 }));
 
 const CategoryIcon = styled(Box)(({ theme }) => ({
-  width: 52,
-  height: 52,
-  borderRadius: '16px',
-  backgroundColor: theme.palette.grey[100],
+  width: 64,
+  height: 64,
+  borderRadius: '20px',
+  backgroundColor: theme.palette.grey[50],
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',
-  fontSize: '22px',
-  marginBottom: theme.spacing(0.5),
-  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+  fontSize: '28px',
+  marginBottom: theme.spacing(1),
+  color: theme.palette.primary.main,
   [theme.breakpoints.down('sm')]: {
-    width: 48,
-    height: 48,
-    fontSize: '20px',
+    width: 56,
+    height: 56,
+    fontSize: '24px',
   },
 }));
 

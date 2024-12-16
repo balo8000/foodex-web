@@ -95,3 +95,124 @@ export const dealsNearby = [
     deliveryTime: '40-45 min',
   },
 ];
+
+export const restaurants = [
+  {
+    id: 1,
+    name: "African Delight",
+    image: "https://images.unsplash.com/photo-1604329760661-e71dc83f8f26?w=500&auto=format&fit=crop&q=80",
+    rating: 4.8,
+    cuisine: "African",
+    deliveryTime: "20-30",
+    offer: "20% OFF",
+    isFavorite: false
+  },
+  {
+    id: 2,
+    name: "Spice Paradise",
+    image: "https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=500&auto=format&fit=crop&q=80",
+    rating: 4.5,
+    cuisine: "Indian",
+    deliveryTime: "25-35",
+    offer: "Free Delivery",
+    isFavorite: false
+  },
+  {
+    id: 3,
+    name: "Sushi Master",
+    image: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=500&auto=format&fit=crop&q=80",
+    rating: 4.9,
+    cuisine: "Japanese",
+    deliveryTime: "30-40",
+    offer: "Buy 1 Get 1",
+    isFavorite: false
+  },
+  {
+    id: 4,
+    name: "Burger House",
+    image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&auto=format&fit=crop&q=80",
+    rating: 4.6,
+    cuisine: "American",
+    deliveryTime: "15-25",
+    offer: "15% OFF",
+    isFavorite: false
+  },
+  {
+    id: 5,
+    name: "Pizza Palace",
+    image: "https://images.unsplash.com/photo-1604382355076-af4b0eb60143?w=500&auto=format&fit=crop&q=80",
+    rating: 4.7,
+    cuisine: "Italian",
+    deliveryTime: "20-30",
+    offer: "Free Drink",
+    isFavorite: false
+  },
+  {
+    id: 6,
+    name: "Taco Fiesta",
+    image: "https://images.unsplash.com/photo-1565299585323-38d6b0865b47?w=500&auto=format&fit=crop&q=80",
+    rating: 4.4,
+    cuisine: "Mexican",
+    deliveryTime: "25-35",
+    offer: "10% OFF",
+    isFavorite: false
+  }
+];
+
+export const categoriesData = [
+  {
+    id: 1,
+    name: "Fast Food",
+    icon: "🍔",
+    image: "https://images.unsplash.com/photo-1561758033-d89a9ad46330?w=500&auto=format&fit=crop&q=80"
+  },
+  {
+    id: 2,
+    name: "Pizza",
+    icon: "🍕",
+    image: "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=500&auto=format&fit=crop&q=80"
+  },
+  {
+    id: 3,
+    name: "Sushi",
+    icon: "🍱",
+    image: "https://images.unsplash.com/photo-1583623025817-d180a2221d0a?w=500&auto=format&fit=crop&q=80"
+  },
+  {
+    id: 4,
+    name: "Desserts",
+    icon: "🍰",
+    image: "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=500&auto=format&fit=crop&q=80"
+  }
+];
+
+export const popularDishes = [
+  {
+    id: 1,
+    name: "Classic Burger",
+    image: "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=500&auto=format&fit=crop&q=80",
+    price: 9.99,
+    rating: 4.8
+  },
+  {
+    id: 2,
+    name: "Margherita Pizza",
+    image: "https://images.unsplash.com/photo-1604382355076-af4b0eb60143?w=500&auto=format&fit=crop&q=80",
+    price: 12.99,
+    rating: 4.7
+  },
+  {
+    id: 3,
+    name: "Sushi Roll",
+    image: "https://images.unsplash.com/photo-1579871494447-9811cf80d66c?w=500&auto=format&fit=crop&q=80",
+    price: 15.99,
+    rating: 4.9
+  },
+  {
+    id: 4,
+    name: "Chocolate Cake",
+    image: "https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=500&auto=format&fit=crop&q=80",
+    price: 7.99,
+    rating: 4.6
+  }
+];

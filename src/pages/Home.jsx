@@ -121,179 +121,180 @@ const RestaurantCard = ({ name, image, rating, cuisine, deliveryTime, offer, onF
   return (
     <Paper
       component={motion.div}
-      whileHover={{ y: -8 }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => {
-        setIsHovered(false);
-        if (!isAdding) setShowQuantity(false);
-      }}
-      elevation={0}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: 20 }}
+      whileHover={{ y: -5 }}
+      elevation={2}
       sx={{
-        borderRadius: 4,
         overflow: 'hidden',
-        cursor: 'pointer',
-        bgcolor: theme.palette.mode === 'dark'
-          ? alpha(theme.palette.background.paper, 0.2)
-          : theme.palette.background.paper,
-        backdropFilter: 'blur(10px)',
-        border: `1px solid ${theme.palette.mode === 'dark'
-          ? alpha(theme.palette.divider, 0.1)
-          : alpha(theme.palette.divider, 0.1)}`,
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'column',
         position: 'relative',
+        borderRadius: 2,
       }}
     >
-      <Box
-        sx={{
-          position: 'relative',
-          paddingTop: '56.25%',
-          backgroundImage: `url(${image})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-        }}
-      >
-        {offer && (
-          <Chip
-            icon={<LocalOffer sx={{ fontSize: 16 }} />}
-            label={offer}
-            color="primary"
-            size="small"
-            sx={{
-              position: 'absolute',
-              top: 12,
-              left: 12,
-              fontWeight: 600,
-            }}
-          />
-        )}
+      <Box sx={{ position: 'relative', paddingTop: '75%', width: '100%' }}>
+        <Box
+          component="img"
+          src={image}
+          alt={name}
+          sx={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            objectFit: 'cover',
+          }}
+        />
         <IconButton
           onClick={handleFavoriteClick}
           sx={{
             position: 'absolute',
-            top: 12,
-            right: 12,
+            top: 8,
+            right: 8,
             bgcolor: 'background.paper',
             '&:hover': { bgcolor: 'background.paper' },
           }}
         >
           {isFavorite ? (
-            <Favorite sx={{ color: theme.palette.error.main }} />
+            <Favorite sx={{ color: 'error.main' }} />
           ) : (
-            <FavoriteBorder sx={{ color: theme.palette.error.main }} />
+            <FavoriteBorder sx={{ color: 'error.main' }} />
           )}
         </IconButton>
-        <Box
-          sx={{
-            position: 'absolute',
-            bottom: 0,
-            left: 0,
-            right: 0,
-            background: 'linear-gradient(transparent, rgba(0,0,0,0.7))',
-            p: 2,
-          }}
-        >
-          <Typography variant="h6" color="common.white" fontWeight={600}>
-            {name}
-          </Typography>
-        </Box>
+        {offer && (
+          <Chip
+            label={offer}
+            size="small"
+            color="error"
+            sx={{
+              position: 'absolute',
+              top: 8,
+              left: 8,
+              fontWeight: 'bold',
+            }}
+          />
+        )}
       </Box>
-      <Box sx={{ p: 2 }}>
+
+      <Box sx={{ p: 2, flexGrow: 1 }}>
+        <Typography variant="h6" noWrap sx={{ mb: 1 }}>
+          {name}
+        </Typography>
+        
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-          <Rating value={rating} readOnly size="small" sx={{ mr: 1 }} />
-          <Typography variant="body2" color="text.secondary">
-            ({rating})
+          <Rating value={rating} precision={0.1} size="small" readOnly />
+          <Typography variant="body2" color="text.secondary" sx={{ ml: 1 }}>
+            {rating}
           </Typography>
         </Box>
-        <Typography variant="body2" color="text.secondary" gutterBottom>
+
+        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
           {cuisine}
         </Typography>
-        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Box sx={{ display: 'flex', alignItems: 'center' }}>
-            <AccessTime sx={{ fontSize: 16, mr: 0.5, color: 'text.secondary' }} />
-            <Typography variant="body2" color="text.secondary">
-              {deliveryTime} min
-            </Typography>
-          </Box>
-          <AnimatePresence>
-            {isHovered && (
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.8 }}
-                style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-              >
-                {showQuantity ? (
-                  <motion.div
-                    initial={{ opacity: 0, width: 0 }}
-                    animate={{ opacity: 1, width: 'auto' }}
-                    exit={{ opacity: 0, width: 0 }}
-                    style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
-                  >
-                    <IconButton
-                      size="small"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleQuantityChange(-1);
-                      }}
-                      sx={{
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
-                        '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.2) },
-                      }}
-                    >
-                      <Remove fontSize="small" />
-                    </IconButton>
-                    <Typography variant="body1" sx={{ minWidth: '20px', textAlign: 'center' }}>
-                      {quantity}
-                    </Typography>
-                    <IconButton
-                      size="small"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleQuantityChange(1);
-                      }}
-                      sx={{
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
-                        '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.2) },
-                      }}
-                    >
-                      <Add fontSize="small" />
-                    </IconButton>
-                  </motion.div>
-                ) : null}
-                <motion.div
-                  whileTap={{ scale: 0.9 }}
-                  whileHover={{ scale: 1.1 }}
-                >
-                  <Tooltip title={showQuantity ? "Add to cart" : "Select quantity"}>
-                    <IconButton
-                      color="primary"
-                      onClick={showQuantity ? handleAddToCart : handleCartClick}
-                      sx={{
-                        bgcolor: alpha(theme.palette.primary.main, 0.1),
-                        '&:hover': {
-                          bgcolor: alpha(theme.palette.primary.main, 0.2),
-                        },
-                        position: 'relative',
-                      }}
-                    >
-                      {isAdding ? (
-                        <motion.div
-                          initial={{ scale: 0 }}
-                          animate={{ scale: 1 }}
-                          exit={{ scale: 0 }}
-                        >
-                          <Check />
-                        </motion.div>
-                      ) : (
-                        <ShoppingCart />
-                      )}
-                    </IconButton>
-                  </Tooltip>
-                </motion.div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <AccessTime sx={{ fontSize: 16, color: 'text.secondary' }} />
+          <Typography variant="body2" color="text.secondary">
+            {deliveryTime} min
+          </Typography>
         </Box>
       </Box>
+
+      <AnimatePresence>
+        {isHovered && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.8 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.8 }}
+            style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+          >
+            {showQuantity ? (
+              <motion.div
+                initial={{ opacity: 0, width: 0 }}
+                animate={{ opacity: 1, width: 'auto' }}
+                exit={{ opacity: 0, width: 0 }}
+                style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+              >
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleQuantityChange(-1);
+                  }}
+                  sx={{
+                    bgcolor: alpha(theme.palette.primary.main, 0.1),
+                    '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.2) },
+                  }}
+                >
+                  <Remove fontSize="small" />
+                </IconButton>
+                <Typography variant="body1" sx={{ minWidth: '20px', textAlign: 'center' }}>
+                  {quantity}
+                </Typography>
+                <IconButton
+                  size="small"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleQuantityChange(1);
+                  }}
+                  sx={{
+                    bgcolor: alpha(theme.palette.primary.main, 0.1),
+                    '&:hover': { bgcolor: alpha(theme.palette.primary.main, 0.2) },
+                  }}
+                >
+                  <Add fontSize="small" />
+                </IconButton>
+              </motion.div>
+            ) : null}
+            <motion.div
+              whileTap={{ scale: 0.9 }}
+              whileHover={{ scale: 1.1 }}
+            >
+              <Tooltip title={showQuantity ? "Add to cart" : "Select quantity"}>
+                <IconButton
+                  color="primary"
+                  onClick={showQuantity ? handleAddToCart : handleCartClick}
+                  sx={{
+                    bgcolor: alpha(theme.palette.primary.main, 0.1),
+                    '&:hover': {
+                      bgcolor: alpha(theme.palette.primary.main, 0.2),
+                    },
+                    position: 'relative',
+                  }}
+                >
+                  {isAdding ? (
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      animate={{ scale: 1 }}
+                      exit={{ scale: 0 }}
+                    >
+                      <Check />
+                    </motion.div>
+                  ) : (
+                    <ShoppingCart />
+                  )}
+                </IconButton>
+              </Tooltip>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      <Button
+        variant="contained"
+        fullWidth
+        onClick={onOrder}
+        sx={{
+          borderTopLeftRadius: 0,
+          borderTopRightRadius: 0,
+        }}
+      >
+        Order Now
+      </Button>
     </Paper>
   );
 };
@@ -593,37 +594,14 @@ const Home = () => {
         </Box>
 
         {/* Popular African Restaurants */}
-        <Box sx={{ mb: 6 }}>
-          <Typography
-            variant="h5"
-            gutterBottom
-            sx={{
-              fontWeight: 600,
-              color: theme.palette.mode === 'dark'
-                ? theme.palette.primary.light
-                : theme.palette.primary.main,
-              display: 'flex',
-              alignItems: 'center',
-              gap: 1,
-            }}
-          >
-            Popular African Restaurants
-            <Chip
-              label="Local Favorites"
-              size="small"
-              color="primary"
-              sx={{
-                fontWeight: 500,
-                bgcolor: alpha(theme.palette.primary.main, 0.1),
-                color: theme.palette.primary.main,
-                border: `1px solid ${alpha(theme.palette.primary.main, 0.2)}`,
-              }}
-            />
+        <Box sx={{ mt: 4 }}>
+          <Typography variant="h6" sx={{ mb: 2, px: 2 }}>
+            Restaurants Near You
           </Typography>
-          <Grid container spacing={3}>
+          <Grid container spacing={2}>
             <AnimatePresence>
               {filteredRestaurants.map((restaurant, index) => (
-                <Grid item xs={12} sm={6} md={4} key={index}>
+                <Grid item xs={6} sm={6} md={4} lg={3} key={index}>
                   <RestaurantCard
                     {...restaurant}
                     onFavorite={(isFavorite) => handleFavorite(restaurant, isFavorite)}

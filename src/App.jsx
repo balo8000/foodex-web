@@ -82,8 +82,9 @@ const ProtectedRoute = ({ children }) => {
 };
 
 function AppContent() {
+  const [mode, setMode] = useState('light');
   const { user } = useUser();
-  const theme = useMemo(() => getTheme(user?.preferences?.darkMode ? 'dark' : 'light'), [user?.preferences?.darkMode]);
+  const theme = useMemo(() => getTheme(user?.preferences?.darkMode ? 'dark' : mode), [user?.preferences?.darkMode, mode]);
 
   return (
     <ThemeProvider theme={theme}>
