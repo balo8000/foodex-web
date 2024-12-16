@@ -10,8 +10,8 @@ const CategoryContainer = styled(Box)(({ theme }) => ({
   padding: theme.spacing(2),
   [theme.breakpoints.down('sm')]: {
     gridTemplateColumns: 'repeat(2, 1fr)',
-    gap: theme.spacing(2),
-    padding: theme.spacing(2),
+    gap: theme.spacing(1.5),
+    padding: theme.spacing(1),
   },
 }));
 
@@ -20,7 +20,7 @@ const CategoryItem = styled(motion.div)(({ theme }) => ({
   flexDirection: 'column',
   alignItems: 'center',
   cursor: 'pointer',
-  padding: theme.spacing(2),
+  padding: theme.spacing(1.5),
   backgroundColor: theme.palette.background.paper,
   borderRadius: theme.shape.borderRadius,
   boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
@@ -28,23 +28,34 @@ const CategoryItem = styled(motion.div)(({ theme }) => ({
   '&:hover': {
     boxShadow: '0 4px 12px rgba(0,0,0,0.1)',
   },
+  position: 'relative',
+  overflow: 'hidden',
 }));
 
 const CategoryIcon = styled(Box)(({ theme }) => ({
-  width: 64,
-  height: 64,
-  borderRadius: '20px',
-  backgroundColor: theme.palette.grey[50],
-  display: 'flex',
-  alignItems: 'center',
-  justifyContent: 'center',
-  fontSize: '28px',
+  width: '100%',
+  paddingTop: '75%',
+  position: 'relative',
   marginBottom: theme.spacing(1),
-  color: theme.palette.primary.main,
-  [theme.breakpoints.down('sm')]: {
-    width: 56,
-    height: 56,
+  borderRadius: theme.shape.borderRadius,
+  overflow: 'hidden',
+  '& img': {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+  },
+  '& .icon-overlay': {
+    position: 'absolute',
+    top: '50%',
+    left: '50%',
+    transform: 'translate(-50%, -50%)',
     fontSize: '24px',
+    color: '#fff',
+    textShadow: '0 2px 4px rgba(0,0,0,0.2)',
+    zIndex: 1,
   },
 }));
 
@@ -83,7 +94,7 @@ const Categories = () => {
         initial="hidden"
         animate="show"
       >
-        {categories.slice(0, 8).map((category) => (
+        {categories.map((category) => (
           <CategoryItem 
             key={category.id} 
             variants={item}
@@ -102,19 +113,18 @@ const Categories = () => {
                 transition: { duration: 0.2 }
               }}
             >
-              {category.icon}
+              <img src={category.image} alt={category.name} />
+              <span className="icon-overlay">{category.icon}</span>
             </CategoryIcon>
             <Typography 
               variant="body2" 
               sx={{ 
                 fontWeight: 500,
                 textAlign: 'center',
-                fontSize: { xs: '0.75rem', sm: '0.8rem' },
-                width: '100%',
+                whiteSpace: 'nowrap',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-                color: 'text.secondary'
+                width: '100%',
               }}
             >
               {category.name}
