@@ -25,7 +25,6 @@ import {
   DarkMode,
   Help,
   ExitToApp,
-  Close,
 } from '@mui/icons-material';
 import { motion } from 'framer-motion';
 import { useUser } from '../contexts/UserContext';
@@ -46,39 +45,25 @@ const Profile = () => {
   const theme = useTheme();
   const { user, updatePreferences, logout } = useUser();
   const [isEditing, setIsEditing] = useState(false);
-  const [error, setError] = useState(null);
-  const [success, setSuccess] = useState(false);
   const [profileData, setProfileData] = useState({
-    name: user?.name || 'Guest User',
-    email: user?.email || '',
-    phone: user?.phone || '',
-    address: user?.address || '',
+    name: user?.name || 'John Doe',
+    email: user?.email || 'john.doe@example.com',
+    phone: user?.phone || '+1 234 567 890',
     darkMode: user?.preferences?.darkMode || false,
     notifications: user?.preferences?.notifications || true,
   });
 
-  const handleSave = async () => {
-    try {
-      setError(null);
-      await updatePreferences({
-        darkMode: profileData.darkMode,
-        notifications: profileData.notifications,
-      });
-      setSuccess(true);
-      setIsEditing(false);
-      setTimeout(() => setSuccess(false), 3000);
-    } catch (err) {
-      setError('Failed to update preferences. Please try again.');
-    }
+  const handleSave = () => {
+    updatePreferences({
+      darkMode: profileData.darkMode,
+      notifications: profileData.notifications,
+    });
+    setIsEditing(false);
   };
 
   const handleLogout = () => {
-    try {
-      logout();
-      navigate('/');
-    } catch (err) {
-      setError('Failed to logout. Please try again.');
-    }
+    logout();
+    navigate('/');
   };
 
   return (
@@ -88,7 +73,7 @@ const Profile = () => {
           <ArrowBack />
         </IconButton>
         <Typography variant="h6" sx={{ fontWeight: 600 }}>
-          Profile
+          Your Profile
         </Typography>
       </Box>
 
@@ -97,32 +82,6 @@ const Profile = () => {
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.3 }}
       >
-        {error && (
-          <Box sx={{ mb: 2 }}>
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              <Typography color="error" sx={{ mb: 1 }}>
-                {error}
-              </Typography>
-            </motion.div>
-          </Box>
-        )}
-
-        {success && (
-          <Box sx={{ mb: 2 }}>
-            <motion.div
-              initial={{ opacity: 0, y: -10 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              <Typography color="success.main" sx={{ mb: 1 }}>
-                Profile updated successfully!
-              </Typography>
-            </motion.div>
-          </Box>
-        )}
-
         <Card sx={{ mb: 3, borderRadius: 2, position: 'relative', overflow: 'visible' }}>
           <Box
             sx={{
@@ -142,64 +101,71 @@ const Profile = () => {
               }}
             />
           </Box>
-          <CardContent sx={{ pt: 6, pb: 2 }}>
-            <Box sx={{ textAlign: 'center', mb: 2 }}>
+
+          <CardContent sx={{ pt: 6, textAlign: 'center' }}>
+            <Box sx={{ mt: 2, mb: 3 }}>
               {isEditing ? (
                 <TextField
                   fullWidth
+                  variant="standard"
                   value={profileData.name}
                   onChange={(e) =>
                     setProfileData({ ...profileData, name: e.target.value })
                   }
-                  sx={{ mb: 2 }}
+                  sx={{ mb: 1 }}
                 />
               ) : (
-                <Typography variant="h6" sx={{ fontWeight: 600 }}>
+                <Typography variant="h5" sx={{ fontWeight: 600, mb: 0.5 }}>
                   {profileData.name}
                 </Typography>
               )}
-              <Typography color="text.secondary" variant="body2">
-                {profileData.email || 'No email provided'}
+              <Typography variant="body2" color="text.secondary">
+                Member since 2023
               </Typography>
             </Box>
-          </CardContent>
-          <Box
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-              gap: 1,
-              p: 2,
-              borderTop: `1px solid ${theme.palette.divider}`,
-            }}
-          >
-            {isEditing ? (
-              <>
-                <Button
-                  variant="outlined"
-                  onClick={() => setIsEditing(false)}
-                  startIcon={<Close />}
-                >
-                  Cancel
-                </Button>
+
+            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
+              {isEditing ? (
                 <Button
                   variant="contained"
-                  onClick={handleSave}
                   startIcon={<Save />}
+                  onClick={handleSave}
+                  sx={{ borderRadius: 2 }}
                 >
-                  Save
+                  Save Changes
                 </Button>
-              </>
-            ) : (
-              <Button
-                variant="outlined"
-                onClick={() => setIsEditing(true)}
-                startIcon={<Edit />}
-              >
-                Edit Profile
-              </Button>
-            )}
-          </Box>
+              ) : (
+                <Button
+                  variant="outlined"
+                  startIcon={<Edit />}
+                  onClick={() => setIsEditing(true)}
+                  sx={{ borderRadius: 2 }}
+                >
+                  Edit Profile
+                </Button>
+              )}
+            </Box>
+          </CardContent>
         </Card>
+
+        <ProfileSection title="Personal Information">
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <TextField
+              label="Email"
+              value={profileData.email}
+              disabled={!isEditing}
+              fullWidth
+              variant="outlined"
+            />
+            <TextField
+              label="Phone"
+              value={profileData.phone}
+              disabled={!isEditing}
+              fullWidth
+              variant="outlined"
+            />
+          </Box>
+        </ProfileSection>
 
         <ProfileSection title="Settings">
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -223,25 +189,68 @@ const Profile = () => {
               <Switch
                 checked={profileData.notifications}
                 onChange={(e) =>
-                  setProfileData({ ...profileData, notifications: e.target.checked })
+                  setProfileData({
+                    ...profileData,
+                    notifications: e.target.checked,
+                  })
                 }
               />
             </Box>
           </Box>
         </ProfileSection>
 
-        <ProfileSection title="Account">
-          <Button
-            fullWidth
-            variant="outlined"
-            color="error"
-            onClick={handleLogout}
-            startIcon={<ExitToApp />}
-            sx={{ mt: 1 }}
-          >
-            Logout
-          </Button>
+        <ProfileSection title="Quick Actions">
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <Button
+              startIcon={<LocationOn />}
+              sx={{ justifyContent: 'flex-start' }}
+              onClick={() => navigate('/addresses')}
+            >
+              Manage Addresses
+            </Button>
+            <Button
+              startIcon={<CreditCard />}
+              sx={{ justifyContent: 'flex-start' }}
+              onClick={() => navigate('/payment-methods')}
+            >
+              Payment Methods
+            </Button>
+            <Button
+              startIcon={<History />}
+              sx={{ justifyContent: 'flex-start' }}
+              onClick={() => navigate('/order-history')}
+            >
+              Order History
+            </Button>
+            <Button
+              startIcon={<Help />}
+              sx={{ justifyContent: 'flex-start' }}
+              onClick={() => navigate('/help')}
+            >
+              Help & Support
+            </Button>
+          </Box>
         </ProfileSection>
+
+        <Button
+          fullWidth
+          variant="outlined"
+          color="error"
+          startIcon={<ExitToApp />}
+          onClick={handleLogout}
+          sx={{
+            mt: 2,
+            mb: 4,
+            borderRadius: 2,
+            py: 1.5,
+            borderWidth: 2,
+            '&:hover': {
+              borderWidth: 2,
+            },
+          }}
+        >
+          Logout
+        </Button>
       </motion.div>
     </Box>
   );

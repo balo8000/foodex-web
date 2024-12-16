@@ -1,7 +1,19 @@
-import { Box } from '@mui/material';
+import { Box, AppBar, Toolbar, IconButton, useTheme } from '@mui/material';
+import { DarkMode, LightMode } from '@mui/icons-material';
 import FancyBottomNav from './navigation/FancyBottomNav';
+import { useUser } from '../contexts/UserContext';
 
 const MainLayout = ({ children }) => {
+  const theme = useTheme();
+  const { user, updatePreferences } = useUser();
+
+  const toggleDarkMode = () => {
+    updatePreferences({
+      ...user?.preferences,
+      darkMode: !user?.preferences?.darkMode,
+    });
+  };
+
   return (
     <Box
       sx={{
@@ -14,6 +26,20 @@ const MainLayout = ({ children }) => {
         bgcolor: 'background.default',
       }}
     >
+      <AppBar 
+        position="sticky" 
+        elevation={0}
+        sx={{ 
+          bgcolor: 'background.paper',
+          borderBottom: `1px solid ${theme.palette.divider}`,
+        }}
+      >
+        <Toolbar sx={{ justifyContent: 'flex-end' }}>
+          <IconButton onClick={toggleDarkMode} color="inherit">
+            {theme.palette.mode === 'dark' ? <LightMode /> : <DarkMode />}
+          </IconButton>
+        </Toolbar>
+      </AppBar>
       <Box
         sx={{
           flex: 1,
