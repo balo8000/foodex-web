@@ -1,555 +1,257 @@
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import {
   Box,
-  Avatar,
   Typography,
-  List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
-  ListItemSecondaryAction,
-  Switch,
-  IconButton,
+  Avatar,
   Button,
+  Card,
+  CardContent,
+  IconButton,
+  TextField,
+  Switch,
   Divider,
   useTheme,
   alpha,
-  Paper,
-  Snackbar,
-  Alert,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogActions,
-  Select,
-  MenuItem,
-  TextField,
-  Collapse,
 } from '@mui/material';
 import {
-  DarkMode,
-  Notifications,
-  Language,
-  Security,
-  Help,
-  ChevronRight,
   Edit,
+  Save,
+  ArrowBack,
   LocationOn,
-  Phone,
-  Email,
-  ExpandLess,
-  ExpandMore,
-  Lock,
-  VpnKey,
-  QuestionAnswer,
-  Translate,
+  CreditCard,
+  History,
+  Notifications,
+  DarkMode,
+  Help,
+  ExitToApp,
 } from '@mui/icons-material';
-import { motion, AnimatePresence } from 'framer-motion';
-import { useUser } from '../context/UserContext';
+import { motion } from 'framer-motion';
+import { useUser } from '../contexts/UserContext';
 
-const ProfileSection = ({ title, children }) => {
-  const theme = useTheme();
-  return (
-    <Paper
-      elevation={0}
-      sx={{
-        mb: 2,
-        p: 2,
-        borderRadius: 3,
-        bgcolor: theme.palette.mode === 'dark'
-          ? alpha(theme.palette.background.paper, 0.2)
-          : theme.palette.background.paper,
-        backdropFilter: 'blur(10px)',
-        border: `1px solid ${theme.palette.mode === 'dark'
-          ? alpha(theme.palette.divider, 0.1)
-          : theme.palette.divider}`,
-      }}
-    >
-      <Typography
-        variant="h6"
-        gutterBottom
-        sx={{
-          color: theme.palette.mode === 'dark'
-            ? theme.palette.primary.light
-            : theme.palette.primary.main,
-          fontWeight: 600,
-          mb: 2,
-        }}
-      >
+const ProfileSection = ({ title, children }) => (
+  <Card sx={{ mb: 2, borderRadius: 2 }}>
+    <CardContent>
+      <Typography variant="h6" sx={{ mb: 2, fontWeight: 600 }}>
         {title}
       </Typography>
       {children}
-    </Paper>
-  );
-};
-
-const languages = [
-  { code: 'en', name: 'English' },
-  { code: 'fr', name: 'Français' },
-  { code: 'es', name: 'Español' },
-  { code: 'de', name: 'Deutsch' },
-  { code: 'it', name: 'Italiano' },
-];
-
-const faqItems = [
-  {
-    question: 'How do I change my delivery address?',
-    answer: 'You can update your delivery address in the Location settings section of your profile.',
-  },
-  {
-    question: 'How can I track my order?',
-    answer: 'Once your order is confirmed, you can track it in real-time from the Orders section.',
-  },
-  {
-    question: 'What payment methods are accepted?',
-    answer: 'We accept credit/debit cards, PayPal, and mobile payment solutions like Apple Pay and Google Pay.',
-  },
-  {
-    question: 'How do I contact customer support?',
-    answer: 'You can reach our customer support team 24/7 through the Help section or by emailing support@foodex.com',
-  },
-];
+    </CardContent>
+  </Card>
+);
 
 const Profile = () => {
+  const navigate = useNavigate();
   const theme = useTheme();
-  const { user, updateUser } = useUser();
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: '',
-    severity: 'success',
+  const { user, updatePreferences, logout } = useUser();
+  const [isEditing, setIsEditing] = useState(false);
+  const [profileData, setProfileData] = useState({
+    name: user?.name || 'John Doe',
+    email: user?.email || 'john.doe@example.com',
+    phone: user?.phone || '+1 234 567 890',
+    darkMode: user?.preferences?.darkMode || false,
+    notifications: user?.preferences?.notifications || true,
   });
-  const [languageDialog, setLanguageDialog] = useState(false);
-  const [securityDialog, setSecurityDialog] = useState(false);
-  const [emailDialog, setEmailDialog] = useState(false);
-  const [locationDialog, setLocationDialog] = useState(false);
-  const [expandedFaq, setExpandedFaq] = useState(null);
-  const [newEmail, setNewEmail] = useState(user.email);
-  const [currentPassword, setCurrentPassword] = useState('');
-  const [newPassword, setNewPassword] = useState('');
-  const [address, setAddress] = useState(user.address || '');
 
-  const handleSnackbarClose = () => {
-    setSnackbar(prev => ({ ...prev, open: false }));
+  const handleSave = () => {
+    updatePreferences({
+      darkMode: profileData.darkMode,
+      notifications: profileData.notifications,
+    });
+    setIsEditing(false);
   };
 
-  const handleLanguageChange = (language) => {
-    updateUser({
-      preferences: {
-        ...user.preferences,
-        language: language.code,
-      }
-    });
-    setLanguageDialog(false);
-    setSnackbar({
-      open: true,
-      message: 'Language updated successfully!',
-      severity: 'success',
-    });
-  };
-
-  const handleSecurityUpdate = () => {
-    // In a real app, you would validate the current password
-    // and make an API call to update the password
-    if (newPassword.length < 6) {
-      setSnackbar({
-        open: true,
-        message: 'Password must be at least 6 characters long',
-        severity: 'error',
-      });
-      return;
-    }
-    setSecurityDialog(false);
-    setCurrentPassword('');
-    setNewPassword('');
-    setSnackbar({
-      open: true,
-      message: 'Password updated successfully!',
-      severity: 'success',
-    });
-  };
-
-  const handleEmailUpdate = () => {
-    // In a real app, you would validate the email
-    // and make an API call to update it
-    if (!newEmail.includes('@')) {
-      setSnackbar({
-        open: true,
-        message: 'Please enter a valid email address',
-        severity: 'error',
-      });
-      return;
-    }
-    updateUser({ email: newEmail });
-    setEmailDialog(false);
-    setSnackbar({
-      open: true,
-      message: 'Email updated successfully!',
-      severity: 'success',
-    });
-  };
-
-  const handleLocationUpdate = () => {
-    updateUser({ address });
-    setLocationDialog(false);
-    setSnackbar({
-      open: true,
-      message: 'Address updated successfully!',
-      severity: 'success',
-    });
-  };
-
-  const handleImageUpload = async (event) => {
-    const file = event.target.files?.[0];
-    if (file) {
-      try {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          updateUser({ profilePicture: e.target.result });
-          setSnackbar({
-            open: true,
-            message: 'Profile picture updated successfully!',
-            severity: 'success',
-          });
-        };
-        reader.readAsDataURL(file);
-      } catch (error) {
-        setSnackbar({
-          open: true,
-          message: 'Failed to update profile picture',
-          severity: 'error',
-        });
-      }
-    }
+  const handleLogout = () => {
+    logout();
+    navigate('/');
   };
 
   return (
-    <Box
-      component={motion.div}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      sx={{
-        minHeight: '100vh',
-        bgcolor: theme.palette.mode === 'dark'
-          ? '#000'
-          : theme.palette.grey[50],
-        p: 2,
-        pb: 10,
-      }}
-    >
-      {/* Profile Header */}
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          mb: 4,
-          pt: 2,
-          position: 'relative',
-        }}
-      >
-        <Box sx={{ position: 'relative' }}>
-          <Avatar
-            src={user.profilePicture || '/avatar-placeholder.jpg'}
-            alt={user.name}
-            sx={{
-              width: 120,
-              height: 120,
-              border: `4px solid ${theme.palette.primary.main}`,
-              boxShadow: theme.palette.mode === 'dark'
-                ? `0 0 20px ${alpha(theme.palette.primary.main, 0.3)}`
-                : 'none',
-            }}
-          />
-          <input
-            type="file"
-            accept="image/*"
-            id="profile-image-upload"
-            style={{ display: 'none' }}
-            onChange={handleImageUpload}
-          />
-          <label htmlFor="profile-image-upload">
-            <IconButton
-              component="span"
-              sx={{
-                position: 'absolute',
-                right: -8,
-                bottom: -8,
-                bgcolor: theme.palette.primary.main,
-                color: 'white',
-                '&:hover': {
-                  bgcolor: theme.palette.primary.dark,
-                },
-              }}
-            >
-              <Edit />
-            </IconButton>
-          </label>
-        </Box>
-        <Typography
-          variant="h5"
-          sx={{
-            mt: 2,
-            fontWeight: 600,
-            color: theme.palette.mode === 'dark'
-              ? theme.palette.primary.light
-              : theme.palette.primary.main,
-          }}
-        >
-          {user.name}
+    <Box sx={{ p: 2, maxWidth: 600, mx: 'auto' }}>
+      <Box sx={{ mb: 3, display: 'flex', alignItems: 'center' }}>
+        <IconButton onClick={() => navigate(-1)} sx={{ mr: 1 }}>
+          <ArrowBack />
+        </IconButton>
+        <Typography variant="h6" sx={{ fontWeight: 600 }}>
+          Profile
         </Typography>
-        <Box sx={{ display: 'flex', gap: 2, mt: 1 }}>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <LocationOn fontSize="small" color="primary" />
-            <Typography variant="body2" color="text.secondary">
-              {user.address || 'Add your location'}
-            </Typography>
-          </Box>
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <Email fontSize="small" color="primary" />
-            <Typography variant="body2" color="text.secondary">
-              {user.email}
-            </Typography>
-          </Box>
-        </Box>
       </Box>
 
-      {/* Settings Sections */}
-      <ProfileSection title="Settings">
-        <List disablePadding>
-          <ListItem
-            button
-            onClick={() => setLanguageDialog(true)}
-            sx={{
-              borderRadius: 2,
-              mb: 1,
-              '&:hover': {
-                bgcolor: alpha(theme.palette.primary.main, 0.1),
-              },
-            }}
-          >
-            <ListItemIcon>
-              <Language color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary="Language"
-              secondary={languages.find(l => l.code === user.preferences?.language)?.name || 'English'}
-            />
-            <ChevronRight color="action" />
-          </ListItem>
-
-          <ListItem
-            button
-            onClick={() => setSecurityDialog(true)}
-            sx={{
-              borderRadius: 2,
-              mb: 1,
-              '&:hover': {
-                bgcolor: alpha(theme.palette.primary.main, 0.1),
-              },
-            }}
-          >
-            <ListItemIcon>
-              <Security color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary="Security"
-              secondary="Password & authentication"
-            />
-            <ChevronRight color="action" />
-          </ListItem>
-
-          <ListItem
-            button
-            onClick={() => setEmailDialog(true)}
-            sx={{
-              borderRadius: 2,
-              mb: 1,
-              '&:hover': {
-                bgcolor: alpha(theme.palette.primary.main, 0.1),
-              },
-            }}
-          >
-            <ListItemIcon>
-              <Email color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary="Email"
-              secondary={user.email}
-            />
-            <ChevronRight color="action" />
-          </ListItem>
-
-          <ListItem
-            button
-            onClick={() => setLocationDialog(true)}
-            sx={{
-              borderRadius: 2,
-              mb: 1,
-              '&:hover': {
-                bgcolor: alpha(theme.palette.primary.main, 0.1),
-              },
-            }}
-          >
-            <ListItemIcon>
-              <LocationOn color="primary" />
-            </ListItemIcon>
-            <ListItemText
-              primary="Location"
-              secondary={user.address || 'Set your address'}
-            />
-            <ChevronRight color="action" />
-          </ListItem>
-        </List>
-      </ProfileSection>
-
-      {/* FAQ Section */}
-      <ProfileSection title="FAQ">
-        <List disablePadding>
-          {faqItems.map((item, index) => (
-            <Box key={index}>
-              <ListItem
-                button
-                onClick={() => setExpandedFaq(expandedFaq === index ? null : index)}
-                sx={{
-                  borderRadius: 2,
-                  mb: 1,
-                  '&:hover': {
-                    bgcolor: alpha(theme.palette.primary.main, 0.1),
-                  },
-                }}
-              >
-                <ListItemIcon>
-                  <QuestionAnswer color="primary" />
-                </ListItemIcon>
-                <ListItemText primary={item.question} />
-                {expandedFaq === index ? <ExpandLess /> : <ExpandMore />}
-              </ListItem>
-              <Collapse in={expandedFaq === index} timeout="auto" unmountOnExit>
-                <Box
-                  sx={{
-                    p: 2,
-                    ml: 7,
-                    mb: 2,
-                    borderRadius: 2,
-                    bgcolor: alpha(theme.palette.primary.main, 0.05),
-                  }}
-                >
-                  <Typography variant="body2" color="text.secondary">
-                    {item.answer}
-                  </Typography>
-                </Box>
-              </Collapse>
-            </Box>
-          ))}
-        </List>
-      </ProfileSection>
-
-      {/* Dialogs */}
-      <Dialog open={languageDialog} onClose={() => setLanguageDialog(false)}>
-        <DialogTitle>Select Language</DialogTitle>
-        <DialogContent>
-          <List>
-            {languages.map((language) => (
-              <ListItem
-                button
-                key={language.code}
-                onClick={() => handleLanguageChange(language)}
-                selected={user.preferences?.language === language.code}
-              >
-                <ListItemIcon>
-                  <Translate />
-                </ListItemIcon>
-                <ListItemText primary={language.name} />
-              </ListItem>
-            ))}
-          </List>
-        </DialogContent>
-      </Dialog>
-
-      <Dialog open={securityDialog} onClose={() => setSecurityDialog(false)}>
-        <DialogTitle>Security Settings</DialogTitle>
-        <DialogContent>
-          <TextField
-            fullWidth
-            type="password"
-            label="Current Password"
-            value={currentPassword}
-            onChange={(e) => setCurrentPassword(e.target.value)}
-            margin="normal"
-          />
-          <TextField
-            fullWidth
-            type="password"
-            label="New Password"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            margin="normal"
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setSecurityDialog(false)}>Cancel</Button>
-          <Button onClick={handleSecurityUpdate} variant="contained" color="primary">
-            Update Password
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog open={emailDialog} onClose={() => setEmailDialog(false)}>
-        <DialogTitle>Update Email</DialogTitle>
-        <DialogContent>
-          <TextField
-            fullWidth
-            type="email"
-            label="New Email"
-            value={newEmail}
-            onChange={(e) => setNewEmail(e.target.value)}
-            margin="normal"
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setEmailDialog(false)}>Cancel</Button>
-          <Button onClick={handleEmailUpdate} variant="contained" color="primary">
-            Update Email
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Dialog open={locationDialog} onClose={() => setLocationDialog(false)}>
-        <DialogTitle>Update Location</DialogTitle>
-        <DialogContent>
-          <TextField
-            fullWidth
-            label="Address"
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            margin="normal"
-            multiline
-            rows={3}
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setLocationDialog(false)}>Cancel</Button>
-          <Button onClick={handleLocationUpdate} variant="contained" color="primary">
-            Update Address
-          </Button>
-        </DialogActions>
-      </Dialog>
-
-      <Snackbar
-        open={snackbar.open}
-        autoHideDuration={4000}
-        onClose={handleSnackbarClose}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      <motion.div
+        initial={{ y: 20, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.3 }}
       >
-        <Alert
-          onClose={handleSnackbarClose}
-          severity={snackbar.severity}
-          sx={{ width: '100%' }}
+        <Card sx={{ mb: 3, borderRadius: 2, position: 'relative', overflow: 'visible' }}>
+          <Box
+            sx={{
+              position: 'absolute',
+              top: -30,
+              left: '50%',
+              transform: 'translateX(-50%)',
+            }}
+          >
+            <Avatar
+              src={user?.avatar}
+              sx={{
+                width: 80,
+                height: 80,
+                border: `4px solid ${theme.palette.background.paper}`,
+                boxShadow: theme.shadows[3],
+              }}
+            />
+          </Box>
+
+          <CardContent sx={{ pt: 6, textAlign: 'center' }}>
+            <Box sx={{ mt: 2, mb: 3 }}>
+              {isEditing ? (
+                <TextField
+                  fullWidth
+                  variant="standard"
+                  value={profileData.name}
+                  onChange={(e) =>
+                    setProfileData({ ...profileData, name: e.target.value })
+                  }
+                  sx={{ mb: 1 }}
+                />
+              ) : (
+                <Typography variant="h5" sx={{ fontWeight: 600, mb: 0.5 }}>
+                  {profileData.name}
+                </Typography>
+              )}
+              <Typography variant="body2" color="text.secondary">
+                Member since 2023
+              </Typography>
+            </Box>
+
+            <Box sx={{ display: 'flex', justifyContent: 'center', gap: 1 }}>
+              {isEditing ? (
+                <Button
+                  variant="contained"
+                  startIcon={<Save />}
+                  onClick={handleSave}
+                  sx={{ borderRadius: 2 }}
+                >
+                  Save Changes
+                </Button>
+              ) : (
+                <Button
+                  variant="outlined"
+                  startIcon={<Edit />}
+                  onClick={() => setIsEditing(true)}
+                  sx={{ borderRadius: 2 }}
+                >
+                  Edit Profile
+                </Button>
+              )}
+            </Box>
+          </CardContent>
+        </Card>
+
+        <ProfileSection title="Personal Information">
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <TextField
+              label="Email"
+              value={profileData.email}
+              disabled={!isEditing}
+              fullWidth
+              variant="outlined"
+            />
+            <TextField
+              label="Phone"
+              value={profileData.phone}
+              disabled={!isEditing}
+              fullWidth
+              variant="outlined"
+            />
+          </Box>
+        </ProfileSection>
+
+        <ProfileSection title="Settings">
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <DarkMode />
+                <Typography>Dark Mode</Typography>
+              </Box>
+              <Switch
+                checked={profileData.darkMode}
+                onChange={(e) =>
+                  setProfileData({ ...profileData, darkMode: e.target.checked })
+                }
+              />
+            </Box>
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                <Notifications />
+                <Typography>Notifications</Typography>
+              </Box>
+              <Switch
+                checked={profileData.notifications}
+                onChange={(e) =>
+                  setProfileData({
+                    ...profileData,
+                    notifications: e.target.checked,
+                  })
+                }
+              />
+            </Box>
+          </Box>
+        </ProfileSection>
+
+        <ProfileSection title="Quick Actions">
+          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+            <Button
+              startIcon={<LocationOn />}
+              sx={{ justifyContent: 'flex-start' }}
+              onClick={() => navigate('/addresses')}
+            >
+              Manage Addresses
+            </Button>
+            <Button
+              startIcon={<CreditCard />}
+              sx={{ justifyContent: 'flex-start' }}
+              onClick={() => navigate('/payment-methods')}
+            >
+              Payment Methods
+            </Button>
+            <Button
+              startIcon={<History />}
+              sx={{ justifyContent: 'flex-start' }}
+              onClick={() => navigate('/order-history')}
+            >
+              Order History
+            </Button>
+            <Button
+              startIcon={<Help />}
+              sx={{ justifyContent: 'flex-start' }}
+              onClick={() => navigate('/help')}
+            >
+              Help & Support
+            </Button>
+          </Box>
+        </ProfileSection>
+
+        <Button
+          fullWidth
+          variant="outlined"
+          color="error"
+          startIcon={<ExitToApp />}
+          onClick={handleLogout}
+          sx={{
+            mt: 2,
+            mb: 4,
+            borderRadius: 2,
+            py: 1.5,
+            borderWidth: 2,
+            '&:hover': {
+              borderWidth: 2,
+            },
+          }}
         >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+          Logout
+        </Button>
+      </motion.div>
     </Box>
   );
 };

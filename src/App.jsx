@@ -92,6 +92,7 @@ function AppContent() {
       <Router>
         <Routes>
           <Route path="/" element={<SplashScreen />} />
+          <Route path="/welcome" element={<WelcomeScreen />} />
           <Route
             path="/home"
             element={

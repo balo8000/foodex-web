@@ -19,39 +19,39 @@ import { useCart } from '../contexts/CartContext';
 const restaurantsData = [
   {
     id: 1,
-    name: 'Jollof House',
-    image: '/images/jollof-rice.jpg',
-    rating: 4.8,
-    cuisine: 'West African • Rice • Local',
-    deliveryTime: 30,
-    offer: '15% OFF',
+    name: "Burger House",
+    image: "/images/burger.jpg",
+    rating: 4.5,
+    cuisine: "American",
+    deliveryTime: "20-30",
+    offer: "20% OFF"
   },
   {
     id: 2,
-    name: 'Pounded Yam Paradise',
-    image: '/images/pounded-yam.jpg',
-    rating: 4.9,
-    cuisine: 'Nigerian • Traditional • Soup',
-    deliveryTime: 35,
-    offer: 'Free Soup Extra',
+    name: "Pizza Palace",
+    image: "/images/pizza.jpg",
+    rating: 4.7,
+    cuisine: "Italian",
+    deliveryTime: "25-35",
+    offer: "Free Delivery"
   },
   {
     id: 3,
-    name: 'Suya Spot',
-    image: '/images/suya.jpg',
-    rating: 4.7,
-    cuisine: 'African • Grills • Spicy',
-    deliveryTime: 25,
+    name: "Pasta Paradise",
+    image: "/images/pasta.jpg",
+    rating: 4.6,
+    cuisine: "Italian",
+    deliveryTime: "30-40"
   },
   {
     id: 4,
-    name: 'Egusi Kitchen',
-    image: '/images/egusi-soup.jpg',
-    rating: 4.6,
-    cuisine: 'Nigerian • Soups • Traditional',
-    deliveryTime: 40,
-    offer: 'Buy 1 Get 1 Free Swallow',
-  },
+    name: "Steak House",
+    image: "/images/steak.jpg",
+    rating: 4.8,
+    cuisine: "American",
+    deliveryTime: "35-45",
+    offer: "New"
+  }
 ];
 
 const featuredLocations = [
