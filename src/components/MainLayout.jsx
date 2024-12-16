@@ -1,3 +1,4 @@
+import React from 'react';
 import { Box, AppBar, Toolbar, IconButton, useTheme, Typography, Badge, Avatar } from '@mui/material';
 import { DarkMode, LightMode, ShoppingCart } from '@mui/icons-material';
 import FancyBottomNav from './navigation/FancyBottomNav';
@@ -99,36 +100,17 @@ const MainLayout = ({ children }) => {
       <Box
         sx={{
           flex: 1,
+          mt: 8, // Adjust top margin to account for fixed AppBar
+          mb: 8, // Add bottom margin for bottom navigation
           overflowY: 'auto',
-          WebkitOverflowScrolling: 'touch',
-          pb: { xs: 8, sm: 9 }, // Add padding for bottom nav
-          '&::-webkit-scrollbar': {
-            display: 'none',
-          },
-          scrollbarWidth: 'none',
-          msOverflowStyle: 'none',
+          px: 2,
         }}
       >
-        {children}
+        {React.isValidElement(children) ? children : null}
       </Box>
-      <Box
-        sx={{
-          position: 'fixed',
-          bottom: 0,
-          left: '50%',
-          transform: 'translateX(-50%)',
-          width: '100%',
-          maxWidth: '100%',
-          zIndex: 1000,
-          '@media (min-width: 481px)': {
-            maxWidth: '480px',
-          },
-        }}
-      >
-        <FancyBottomNav />
-      </Box>
+      <FancyBottomNav />
     </Box>
   );
-};
+}
 
 export default MainLayout;
