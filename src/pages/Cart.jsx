@@ -180,105 +180,161 @@ const CartItem = ({ item, onUpdateQuantity, onRemove }) => {
 const Cart = () => {
   const navigate = useNavigate();
   const theme = useTheme();
-  const { cart, updateQuantity, removeFromCart, clearCart } = useCart();
+  const { cartItems, removeFromCart, updateQuantity, getCartTotal, clearCart } = useCart();
   const [isCheckingOut, setIsCheckingOut] = useState(false);
+  const [promoCode, setPromoCode] = useState('');
+  const [showPromoInput, setShowPromoInput] = useState(false);
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const deliveryFee = total > 50 ? 0 : 5.99;
-  const finalTotal = total + deliveryFee;
+  if (!cartItems.length) {
+    return <EmptyCart />;
+  }
 
   const handleCheckout = () => {
     setIsCheckingOut(true);
     // Simulate checkout process
     setTimeout(() => {
       clearCart();
+      setIsCheckingOut(false);
       navigate('/home');
     }, 2000);
   };
 
-  if (cart.length === 0) {
-    return <EmptyCart />;
-  }
-
   return (
-    <Box sx={{ p: 2, maxWidth: 600, mx: 'auto' }}>
+    <Box sx={{ p: 2, maxWidth: 800, mx: 'auto' }}>
       <Box sx={{ mb: 3, display: 'flex', alignItems: 'center' }}>
         <IconButton onClick={() => navigate(-1)} sx={{ mr: 1 }}>
           <ArrowBack />
         </IconButton>
         <Typography variant="h6" sx={{ fontWeight: 600 }}>
-          Your Cart ({cart.length} {cart.length === 1 ? 'item' : 'items'})
+          Shopping Cart
         </Typography>
       </Box>
 
-      <AnimatePresence>
-        {cart.map((item) => (
-          <CartItem
-            key={item.id}
-            item={item}
-            onUpdateQuantity={updateQuantity}
-            onRemove={removeFromCart}
-          />
-        ))}
-      </AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.3 }}
+      >
+        <Box sx={{ mb: 3 }}>
+          {cartItems.map((item) => (
+            <Card
+              key={item.id}
+              sx={{
+                mb: 2,
+                borderRadius: 2,
+                boxShadow: theme.shadows[2],
+                overflow: 'hidden',
+              }}
+            >
+              <CardContent sx={{ p: 2 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
+                  <Box
+                    component="img"
+                    src={item.image}
+                    alt={item.name}
+                    sx={{
+                      width: 80,
+                      height: 80,
+                      borderRadius: 1,
+                      objectFit: 'cover',
+                    }}
+                  />
+                  <Box sx={{ flex: 1 }}>
+                    <Typography variant="h6" sx={{ mb: 1 }}>
+                      {item.name}
+                    </Typography>
+                    <Typography color="primary" variant="h6">
+                      ${(item.price * (item.quantity || 1)).toFixed(2)}
+                    </Typography>
+                  </Box>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                    <IconButton
+                      size="small"
+                      onClick={() => updateQuantity(item.id, (item.quantity || 1) - 1)}
+                    >
+                      <Remove />
+                    </IconButton>
+                    <Typography sx={{ minWidth: 30, textAlign: 'center' }}>
+                      {item.quantity || 1}
+                    </Typography>
+                    <IconButton
+                      size="small"
+                      onClick={() => updateQuantity(item.id, (item.quantity || 1) + 1)}
+                    >
+                      <Add />
+                    </IconButton>
+                    <IconButton
+                      size="small"
+                      onClick={() => removeFromCart(item.id)}
+                      sx={{ ml: 1 }}
+                    >
+                      <Delete />
+                    </IconButton>
+                  </Box>
+                </Box>
+              </CardContent>
+            </Card>
+          ))}
+        </Box>
 
-      <Card sx={{ mt: 3, borderRadius: 2, boxShadow: theme.shadows[2] }}>
-        <CardContent>
-          <Typography variant="subtitle1" sx={{ fontWeight: 600, mb: 2 }}>
-            Order Summary
-          </Typography>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-            <Typography color="text.secondary">Subtotal</Typography>
-            <Typography>${total.toFixed(2)}</Typography>
-          </Box>
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 1 }}>
-            <Typography color="text.secondary">Delivery Fee</Typography>
-            <Typography>
-              {deliveryFee === 0 ? (
-                <Chip
-                  label="FREE"
-                  size="small"
-                  color="success"
-                  sx={{ fontWeight: 600 }}
+        <Card sx={{ borderRadius: 2, mb: 3 }}>
+          <CardContent>
+            <Box sx={{ mb: 2 }}>
+              <Button
+                startIcon={<LocalOffer />}
+                onClick={() => setShowPromoInput(!showPromoInput)}
+                sx={{ mb: 1 }}
+              >
+                {showPromoInput ? 'Hide Promo Code' : 'Add Promo Code'}
+              </Button>
+              <Collapse in={showPromoInput}>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                  <TextField
+                    size="small"
+                    placeholder="Enter promo code"
+                    value={promoCode}
+                    onChange={(e) => setPromoCode(e.target.value)}
+                    sx={{ flex: 1 }}
+                  />
+                  <Button variant="outlined">Apply</Button>
+                </Box>
+              </Collapse>
+            </Box>
+            <Divider sx={{ my: 2 }} />
+            <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
+              <Typography variant="h6">Total:</Typography>
+              <Typography variant="h6" color="primary">
+                ${getCartTotal().toFixed(2)}
+              </Typography>
+            </Box>
+            <Button
+              fullWidth
+              variant="contained"
+              size="large"
+              onClick={handleCheckout}
+              disabled={isCheckingOut}
+              sx={{
+                py: 1.5,
+                borderRadius: 2,
+                position: 'relative',
+                overflow: 'hidden',
+              }}
+            >
+              {isCheckingOut ? 'Processing...' : 'Checkout'}
+              {isCheckingOut && (
+                <LinearProgress
+                  sx={{
+                    position: 'absolute',
+                    bottom: 0,
+                    left: 0,
+                    right: 0,
+                  }}
                 />
-              ) : (
-                `$${deliveryFee.toFixed(2)}`
               )}
-            </Typography>
-          </Box>
-          <Divider sx={{ my: 2 }} />
-          <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 2 }}>
-            <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-              Total
-            </Typography>
-            <Typography variant="subtitle1" sx={{ fontWeight: 600 }}>
-              ${finalTotal.toFixed(2)}
-            </Typography>
-          </Box>
-          <Button
-            fullWidth
-            variant="contained"
-            size="large"
-            onClick={handleCheckout}
-            disabled={isCheckingOut}
-            sx={{
-              borderRadius: 2,
-              py: 1.5,
-              bgcolor: theme.palette.primary.main,
-              '&:hover': {
-                bgcolor: theme.palette.primary.dark,
-                transform: 'scale(1.02)',
-              },
-              transition: 'all 0.2s',
-            }}
-          >
-            {isCheckingOut ? 'Processing...' : 'Checkout'}
-          </Button>
-          {isCheckingOut && (
-            <LinearProgress sx={{ mt: 2, borderRadius: 1 }} />
-          )}
-        </CardContent>
-      </Card>
+            </Button>
+          </CardContent>
+        </Card>
+      </motion.div>
     </Box>
   );
 };
