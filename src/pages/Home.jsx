@@ -27,28 +27,64 @@ const featuredItems = [
     image: '/images/pizza.jpg',
     preparationTime: 20,
     discount: 15,
+    cuisine: 'Italian'
   },
   {
     id: 2,
-    name: 'Beef Burger',
-    description: 'Premium beef patty with lettuce, tomato, cheese, and special sauce',
-    price: 9.99,
+    name: 'Sushi Roll Platter',
+    description: 'Assorted fresh sushi rolls with wasabi and pickled ginger',
+    price: 24.99,
     rating: 4.8,
     reviews: 256,
-    image: '/images/burger.jpg',
-    preparationTime: 15,
+    image: '/images/sushi.jpg',
+    preparationTime: 25,
+    cuisine: 'Japanese'
   },
   {
     id: 3,
-    name: 'Pasta Carbonara',
-    description: 'Creamy pasta with pancetta, eggs, parmesan, and black pepper',
+    name: 'Pad Thai',
+    description: 'Stir-fried rice noodles with shrimp, tofu, peanuts, and tamarind sauce',
     price: 14.99,
     rating: 4.7,
     reviews: 189,
-    image: '/images/pasta.jpg',
-    preparationTime: 25,
+    image: '/images/padthai.jpg',
+    preparationTime: 15,
     discount: 10,
+    cuisine: 'Thai'
   },
+  {
+    id: 4,
+    name: 'Beef Burger Deluxe',
+    description: 'Premium beef patty with cheese, bacon, and special sauce',
+    price: 16.99,
+    rating: 4.6,
+    reviews: 210,
+    image: '/images/burger.jpg',
+    preparationTime: 18,
+    cuisine: 'American'
+  },
+  {
+    id: 5,
+    name: 'Butter Chicken',
+    description: 'Tender chicken in rich tomato-based curry sauce',
+    price: 18.99,
+    rating: 4.9,
+    reviews: 300,
+    image: '/images/butterchicken.jpg',
+    preparationTime: 22,
+    cuisine: 'Indian'
+  },
+  {
+    id: 6,
+    name: 'Paella',
+    description: 'Traditional Spanish rice dish with seafood and saffron',
+    price: 28.99,
+    rating: 4.7,
+    reviews: 150,
+    image: '/images/paella.jpg',
+    preparationTime: 30,
+    cuisine: 'Spanish'
+  }
 ];
 
 const categories = [
@@ -60,13 +96,13 @@ const categories = [
   },
   {
     id: 2,
-    name: 'Pizza',
+    name: 'Italian',
     icon: <LocalPizza />,
     color: '#FF9800',
   },
   {
     id: 3,
-    name: 'Restaurant',
+    name: 'Asian',
     icon: <Restaurant />,
     color: '#4CAF50',
   },
@@ -121,7 +157,15 @@ const Home = () => {
             overflowX: 'auto',
             pb: 2,
             '::-webkit-scrollbar': {
-              display: 'none',
+              height: 6,
+            },
+            '::-webkit-scrollbar-track': {
+              backgroundColor: alpha(theme.palette.primary.main, 0.1),
+              borderRadius: 3,
+            },
+            '::-webkit-scrollbar-thumb': {
+              backgroundColor: theme.palette.primary.main,
+              borderRadius: 3,
             },
           }}
         >
@@ -134,7 +178,7 @@ const Home = () => {
               <Card
                 onClick={() => setSelectedCategory(category.name)}
                 sx={{
-                  minWidth: 100,
+                  minWidth: 120,
                   cursor: 'pointer',
                   bgcolor:
                     selectedCategory === category.name
@@ -146,6 +190,7 @@ const Home = () => {
                       : 'divider',
                   borderWidth: 1,
                   borderStyle: 'solid',
+                  flex: '0 0 auto',
                 }}
               >
                 <CardContent
@@ -193,13 +238,37 @@ const Home = () => {
             variant="outlined"
           />
         </Box>
-        <Grid container spacing={3}>
+        <Box
+          sx={{
+            display: 'flex',
+            gap: 2,
+            overflowX: 'auto',
+            pb: 2,
+            '::-webkit-scrollbar': {
+              height: 6,
+            },
+            '::-webkit-scrollbar-track': {
+              backgroundColor: alpha(theme.palette.primary.main, 0.1),
+              borderRadius: 3,
+            },
+            '::-webkit-scrollbar-thumb': {
+              backgroundColor: theme.palette.primary.main,
+              borderRadius: 3,
+            },
+          }}
+        >
           {featuredItems.map((item) => (
-            <Grid item xs={12} sm={6} md={4} key={item.id}>
+            <Box
+              key={item.id}
+              sx={{
+                minWidth: 280,
+                flex: '0 0 auto',
+              }}
+            >
               <FoodCard food={item} />
-            </Grid>
+            </Box>
           ))}
-        </Grid>
+        </Box>
       </Box>
     </Container>
   );
