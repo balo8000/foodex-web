@@ -1,109 +1,67 @@
-import { useState, useMemo } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate, Outlet } from 'react-router-dom';
-import { ThemeProvider, createTheme, CssBaseline } from '@mui/material';
-import { CartProvider } from './contexts/CartContext';
-import { UserProvider } from './contexts/UserContext';
-import { UserDataProvider } from './contexts/UserDataContext';
-
-// Pages
-import SplashScreen from './pages/SplashScreen';
-import WelcomeScreen from './pages/WelcomeScreen';
-import AuthOptions from './pages/AuthOptions';
-import Login from './pages/Login';
-import SignUp from './pages/SignUp';
-import RestaurantMenu from './pages/RestaurantMenu';
-import Cart from './pages/Cart';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { ThemeProvider, createTheme } from '@mui/material';
+import CssBaseline from '@mui/material/CssBaseline';
 import Home from './pages/Home';
-import Profile from './pages/Profile';
-import Addresses from './pages/Addresses';
-import PaymentMethods from './pages/PaymentMethods';
-import OrderHistory from './pages/OrderHistory';
-import MainLayout from './components/MainLayout';
-import PageTransition from './components/PageTransition';
+import RestaurantMenu from './pages/RestaurantMenu';
+import { CartProvider } from './contexts/CartContext';
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#4CAF50',
-      light: '#81C784',
-      dark: '#388E3C',
-      contrastText: '#fff',
+      main: '#FF5722',
     },
-    error: {
-      main: '#FF4B3A',
+    secondary: {
+      main: '#2196F3',
+    },
+    background: {
+      default: '#f5f5f5',
     },
   },
   typography: {
-    fontFamily: '"Poppins", "Roboto", "Helvetica", "Arial", sans-serif',
-  },
-  shape: {
-    borderRadius: 8,
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    h1: {
+      fontWeight: 700,
+    },
+    h2: {
+      fontWeight: 600,
+    },
+    h3: {
+      fontWeight: 600,
+    },
   },
   components: {
     MuiButton: {
       styleOverrides: {
         root: {
+          borderRadius: 8,
           textTransform: 'none',
-          fontWeight: 600,
         },
       },
     },
     MuiCard: {
       styleOverrides: {
         root: {
-          borderRadius: 16,
+          borderRadius: 12,
+          boxShadow: '0 4px 6px rgba(0,0,0,0.1)',
         },
       },
     },
   },
 });
 
-function ProtectedRoute() {
-  // Temporary authentication logic - replace with actual authentication
-  const isAuthenticated = true; 
-  return isAuthenticated ? (
-    <MainLayout>
-      <PageTransition>
-        <Outlet />
-      </PageTransition>
-    </MainLayout>
-  ) : (
-    <Navigate to="/welcome" replace />
-  );
-}
-
 function App() {
   return (
-    <Router>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <UserProvider>
-          <UserDataProvider>
-            <CartProvider>
-              <Routes>
-                <Route path="/" element={<SplashScreen />} />
-                <Route path="/welcome" element={<WelcomeScreen />} />
-                <Route path="/auth" element={<AuthOptions />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<SignUp />} />
-                
-                <Route element={<ProtectedRoute />}>
-                  <Route path="/home" element={<Home />} />
-                  <Route path="/menu" element={<RestaurantMenu />} />
-                  <Route path="/cart" element={<Cart />} />
-                  <Route path="/profile" element={<Profile />} />
-                  <Route path="/addresses" element={<Addresses />} />
-                  <Route path="/payment-methods" element={<PaymentMethods />} />
-                  <Route path="/order-history" element={<OrderHistory />} />
-                </Route>
-                
-                <Route path="*" element={<Navigate to="/" replace />} />
-              </Routes>
-            </CartProvider>
-          </UserDataProvider>
-        </UserProvider>
-      </ThemeProvider>
-    </Router>
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <CartProvider>
+        <Router>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/menu" element={<RestaurantMenu />} />
+          </Routes>
+        </Router>
+      </CartProvider>
+    </ThemeProvider>
   );
 }
 
